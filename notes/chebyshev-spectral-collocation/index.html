@@ -1,0 +1,382 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="Misty Sigh"><meta name="copyright" content="Misty Sigh"><meta name="generator" content="Hexo 7.3.0"><meta name="theme" content="hexo-theme-yun"><title>从零理解 Chebyshev 谱配置法 | cloudintosea's blog</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/star-markdown-css@0.4.1/dist/yun/yun-markdown.min.css"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/prism-theme-vars/base.css"><script src="https://fastly.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>function initScrollReveal() {
+  [".post-card",".markdown-body img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+}
+document.addEventListener("DOMContentLoaded", initScrollReveal);
+document.addEventListener("pjax:success", initScrollReveal);
+</script><link rel="icon" type="image/png" href="/yun.png"><link rel="mask-icon" href="/yun.svg" color="#0078E7"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fastly.jsdelivr.net/npm/" crossorigin><script id="yun-config">
+    window.Yun = {}
+    window.CONFIG = {"hostname":"mistysigh.github.io","root":"/","title":"心与行并，渐行渐远，且慢且慢","version":"1.10.11","mode":"auto","copycode":true,"page":{"isPost":false},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}.","hits":"${hits} results found","hits_time":"${hits} results found in ${time} ms"},"anonymous_image":"https://cdn.yunyoujun.cn/img/avatar/none.jpg","say":{"api":"https://el-bot-api.vercel.app/api/words/young"},"fireworks":{"colors":null},"vendors":{"host":"https://fastly.jsdelivr.net/npm/","darken":"https://fastly.jsdelivr.net/npm/darken@1.5.0"}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/hexo-theme-yun.js" type="module"></script><meta property="og:type" content="article">
+<meta property="og:title" content="从零理解 Chebyshev 谱配置法">
+<meta property="og:url" content="https://mistysigh.github.io/notes/chebyshev-spectral-collocation/">
+<meta property="og:site_name" content="cloudintosea&#39;s blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Misty Sigh">
+<meta name="twitter:card" content="summary"><script>(function() {
+  if (CONFIG.mode !== 'auto') return
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const setting = localStorage.getItem('darken-mode') || 'auto'
+  if (setting === 'dark' || (prefersDark && setting !== 'light'))
+    document.documentElement.classList.toggle('dark', true)
+})()</script><link rel="stylesheet" href="/css/study-note.css"><script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]],packages:{"[+]":["ams"]}},options:{enableMenu:false}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><script src="https://code.iconify.design/2/2.1.1/iconify.min.js"></script><script>// Define global variable
+IconifyProviders = {
+  // Empty prefix: overwrite default API provider configuration
+  '': {
+    // Use custom API first, use Iconify public API as backup
+    resources: [
+        'https://api.iconify.design',
+    ],
+    // Wait for 1 second before switching API hosts
+    rotate: 1000,
+  },
+};</script><script defer src="https://fastly.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js" type="module"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js" type="module"></script><div class="sidebar-panel sidebar-panel-active" id="site-overview-wrap"><div class="site-info"><a class="site-author-avatar" href="/about/" title="Misty Sigh"><img width="96" loading="lazy" src="/images/myself.png" alt="Misty Sigh"><span class="site-author-status" title="观雨识海">☺️</span></a><div class="site-author-name"><a href="/about/">Misty Sigh</a></div><span class="site-name">cloudintosea's blog</span><sub class="site-subtitle"></sub><div class="site-description"></div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="Home"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:home-4-line"></span></span></a><div class="site-state-item"><a href="/archives/" title="Archives"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:archive-line"></span></span><span class="site-state-item-count">2</span></a></div><div class="site-state-item"><a href="/notes/" title="学习笔记" aria-label="学习笔记"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:book-open-line"></span></span><span class="site-state-item-count">1</span></a></div><div class="site-state-item"><a href="/life/" title="生活记录" aria-label="生活记录"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:camera-line"></span></span><span class="site-state-item-count">1</span></a></div><a class="site-state-item hty-icon-button" target="_blank" rel="noopener" href="https://yun.yunyoujun.cn" title="文档"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:settings-line"></span></span></a></nav><hr style="margin-bottom:0.5rem"><hr style="margin:0.5rem 1rem"><div class="links"><a class="links-item hty-icon-button" href="/links/" title="我的小伙伴们" style="color:dodgerblue"><span class="icon iconify" data-icon="ri:genderless-line"></span></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><span class="icon iconify" data-icon="ri:contrast-2-line"></span></a></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block study-note" itemscope itemtype="https://schema.org/Article"><link itemprop="mainEntityOfPage" href="https://mistysigh.github.io/notes/chebyshev-spectral-collocation/"><header class="post-header"><h1 class="post-title" itemprop="name headline">从零理解 Chebyshev 谱配置法</h1><p class="study-subtitle">Lagrange 插值、谱微分矩阵与一维 Poisson 边值问题</p><div class="post-meta"><a href="/notes/">学习笔记</a> · Chebyshev 谱配置法</div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body"><p class="study-lead">从节点值与 Lagrange 插值出发，推导 Chebyshev 微分矩阵，再用一维 Poisson 边值问题检验离散与程序。</p><p class="study-route">节点值 → 全局插值 → 微分矩阵 → 边值问题 → 数值验证</p><nav class="study-toc" aria-label="本文目录"><h2>本文目录</h2><ol><li><a href="#学习目标与总体路线"><span>01</span>学习目标与总体路线</a></li><li><a href="#从连续函数到节点值"><span>02</span>从连续函数到节点值</a></li><li><a href="#lagrange-基函数让系数直接等于节点值"><span>03</span>Lagrange 基函数：让系数直接等于节点值</a></li><li><a href="#微分矩阵的定义与意义"><span>04</span>微分矩阵的定义与意义</a></li><li><a href="#任意节点上的微分矩阵公式"><span>05</span>任意节点上的微分矩阵公式</a></li><li><a href="#chebyshevgausslobatto-节点"><span>06</span>Chebyshev–Gauss–Lobatto 节点</a></li><li><a href="#端点系数与交替符号的完整证明"><span>07</span>端点系数与交替符号的完整证明</a></li><li><a href="#chebyshev-微分矩阵"><span>08</span>Chebyshev 微分矩阵</a></li><li><a href="#matlab-实现及逐行解释"><span>09</span>MATLAB 实现及逐行解释</a></li><li><a href="#高阶导数矩阵"><span>10</span>高阶导数矩阵</a></li><li><a href="#经典例子一维-poisson-边值问题"><span>11</span>经典例子：一维 Poisson 边值问题</a></li><li><a href="#验证微分矩阵"><span>12</span>验证微分矩阵</a></li><li><a href="#谱收敛实验"><span>13</span>谱收敛实验</a></li><li><a href="#常见混淆与排错"><span>14</span>常见混淆与排错</a></li><li><a href="#符号表"><span>15</span>符号表</a></li><li><a href="#建议练习"><span>16</span>建议练习</a></li><li><a href="#核心结论"><span>17</span>核心结论</a></li></ol></nav><h2 id="学习目标与总体路线">学习目标与总体路线</h2>
+<p>本手册从一个具体问题出发：只知道函数在有限个节点上的值，怎样计算这些节点上的导数，并进一步求解微分方程？最终目标是理解并实现 <span class="math display">\[\boldsymbol{u}&#39;\approx D\boldsymbol{u},
+  \qquad
+  \boldsymbol{u}&#39;&#39;\approx D^2\boldsymbol{u}.\tag{1.1}\]</span> 这里的关键对象是谱微分矩阵 <span class="math inline">\(D\)</span>。整条逻辑链为 <span class="math display">\[\text{节点值}
+\longrightarrow \text{全局插值多项式}
+\longrightarrow \text{对插值多项式求导}
+\longrightarrow \text{微分矩阵}
+\longrightarrow \text{代数方程组}.\]</span></p>
+<p>读完后应能回答以下问题：</p>
+<ol>
+<li><p>为什么选择 Lagrange 基函数？</p></li>
+<li><p><span class="math inline">\(D_{ij}=\ell_j&#39;(x_i)\)</span> 的行、列分别表示什么？</p></li>
+<li><p>Chebyshev 节点为什么会产生 <span class="math inline">\((-1)^{i+j}\)</span>？</p></li>
+<li><p>为什么端点修正系数为 <span class="math inline">\(c_0=c_N=2\)</span>？</p></li>
+<li><p>为什么对角元可以取非对角元的负行和？</p></li>
+<li><p>为什么二阶导数矩阵是 <span class="math inline">\(D^2\)</span> 而不是 <span class="math inline">\(D.^2\)</span>？</p></li>
+</ol>
+<h2 id="从连续函数到节点值">从连续函数到节点值</h2>
+<p>设函数 <span class="math inline">\(u(x)\)</span> 定义在 <span class="math inline">\([-1,1]\)</span> 上。计算机不能保存连续函数的全部信息，因此选取 <span class="math inline">\(N+1\)</span> 个互异节点 <span class="math display">\[x_0,x_1,\ldots,x_N\tag{2.1}\]</span> 并保存节点值 <span class="math display">\[u_j:=u(x_j),\qquad j=0,1,\ldots,N.\tag{2.2}\]</span> 组成向量 <span class="math display">\[\boldsymbol{u}
+  =\begin{bmatrix}u_0&amp;u_1&amp;\cdots&amp;u_N\end{bmatrix}^{\mathsf T}.\tag{2.3}\]</span></p>
+<p>谱配置法不直接对离散数据做局部差分，而是先构造次数不超过 <span class="math inline">\(N\)</span> 的全局多项式 <span class="math inline">\(p_N(x)\)</span>，使得 <span class="math display">\[p_N(x_j)=u_j,\qquad j=0,1,\ldots,N.\tag{2.4}\]</span> 然后使用 <span class="math display">\[u&#39;(x_i)\approx p_N&#39;(x_i).\tag{2.5}\]</span> 需要明确：我们对 <span class="math inline">\(p_N\)</span> 的求导是精确的；近似发生在用 <span class="math inline">\(p_N\)</span> 代替原函数 <span class="math inline">\(u\)</span> 这一步。</p>
+<h2 id="lagrange-基函数让系数直接等于节点值">Lagrange 基函数：让系数直接等于节点值</h2>
+<h3 id="定义">定义</h3>
+<p>第 <span class="math inline">\(j\)</span> 个 Lagrange 基函数定义为 <span class="math display" id="eq:lagrange-basis">\[\boxed{
+  \ell_j(x)=
+  \prod_{\substack{k=0\\k\ne j}}^N
+  \frac{x-x_k}{x_j-x_k}}\tag{3.1}\]</span> 其中 <span class="math inline">\(j\)</span> 固定，<span class="math inline">\(k\)</span> 是连乘指标。</p>
+<p>当 <span class="math inline">\(x=x_i\)</span> 且 <span class="math inline">\(i\ne j\)</span> 时，分子中包含因子 <span class="math inline">\(x_i-x_i=0\)</span>，因此 <span class="math display">\[\ell_j(x_i)=0.\tag{3.2}\]</span> 当 <span class="math inline">\(x=x_j\)</span> 时，式 <a href="#eq:lagrange-basis">(3.1)</a> 中每个分子都等于对应分母，因此 <span class="math display">\[\ell_j(x_j)=1.\tag{3.3}\]</span> 统一写成 <span class="math display">\[\boxed{\ell_j(x_i)=\delta_{ij}},
+  \qquad
+  \delta_{ij}=\begin{cases}1,&amp;i=j,\\0,&amp;i\ne j.\end{cases}\tag{3.4}\]</span></p>
+<p>这个等式只描述有限个节点处的取值，并不表示 <span class="math inline">\(\ell_j(x)\)</span> 恒为零。固定 <span class="math inline">\(j\)</span> 后，<span class="math inline">\(\ell_j\)</span> 在自己的节点处为 <span class="math inline">\(1\)</span>，在另外 <span class="math inline">\(N\)</span> 个节点处为 <span class="math inline">\(0\)</span>，在节点之间一般不为零。</p>
+<h3 id="插值多项式">插值多项式</h3>
+<p>定义 <span class="math display" id="eq:interpolant">\[\boxed{p_N(x)=\sum_{j=0}^N u_j\ell_j(x)}.\tag{3.5}\]</span> 在节点 <span class="math inline">\(x_i\)</span> 处， <span class="math display">\[p_N(x_i)=\sum_{j=0}^N u_j\delta_{ij}=u_i.\tag{3.6}\]</span> 因此，式 <a href="#eq:interpolant">(3.5)</a> 自动穿过全部节点。选择 Lagrange 基的思想动机正是：展开系数 <span class="math inline">\(u_j\)</span> 直接就是具有物理意义的节点值，不需要再从单项式系数反解节点值。</p>
+<h2 id="微分矩阵的定义与意义">微分矩阵的定义与意义</h2>
+<p>对式 <a href="#eq:interpolant">(3.5)</a> 求导： <span class="math display">\[p_N&#39;(x)=\sum_{j=0}^N u_j\ell_j&#39;(x).\tag{4.1}\]</span> 在 <span class="math inline">\(x_i\)</span> 处计算： <span class="math display">\[p_N&#39;(x_i)=\sum_{j=0}^N \ell_j&#39;(x_i)u_j.\tag{4.2}\]</span> 定义 <span class="math display" id="eq:D-definition">\[\boxed{D_{ij}:=\ell_j&#39;(x_i)}.\tag{4.3}\]</span> 于是 <span class="math display">\[\boxed{p_N&#39;(x_i)=\sum_{j=0}^N D_{ij}u_j},
+  \qquad
+  \boxed{\boldsymbol{u}&#39;\approx D\boldsymbol{u}}.\tag{4.4}\]</span></p>
+<p>在 <span class="math inline">\(D_{ij}\)</span> 中：</p>
+<ul>
+<li><p>行指标 <span class="math inline">\(i\)</span> 表示在哪个节点 <span class="math inline">\(x_i\)</span> 计算导数；</p></li>
+<li><p>列指标 <span class="math inline">\(j\)</span> 表示节点值 <span class="math inline">\(u_j\)</span> 对该导数的贡献；</p></li>
+<li><p>第 <span class="math inline">\(i\)</span> 行给出 <span class="math inline">\(p_N&#39;(x_i)\)</span> 对全部节点值的线性组合。</p></li>
+</ul>
+<p>因此谱微分是全局的：通常 <span class="math inline">\(D\)</span> 是稠密矩阵，一个节点处的导数使用全部节点值。</p>
+<h2 id="任意节点上的微分矩阵公式">任意节点上的微分矩阵公式</h2>
+<h3 id="节点多项式">节点多项式</h3>
+<p>定义节点多项式 <span class="math display">\[\omega(x)=\prod_{k=0}^N(x-x_k).\tag{5.1}\]</span> 把第 <span class="math inline">\(j\)</span> 个因子提出： <span class="math display">\[\omega(x)=(x-x_j)\prod_{k\ne j}(x-x_k).\tag{5.2}\]</span> 另一方面，由乘积求导法则， <span class="math display">\[\omega&#39;(x)=\sum_{m=0}^N\prod_{k\ne m}(x-x_k).\tag{5.3}\]</span> 令 <span class="math inline">\(x=x_j\)</span>。当 <span class="math inline">\(m\ne j\)</span> 时，相应乘积含有 <span class="math inline">\(x_j-x_j\)</span>，故整项为零；只有 <span class="math inline">\(m=j\)</span> 的一项保留： <span class="math display">\[\omega&#39;(x_j)=\prod_{k\ne j}(x_j-x_k).\tag{5.4}\]</span> 所以 Lagrange 基可改写为 <span class="math display" id="eq:lagrange-omega">\[\boxed{
+  \ell_j(x)=\frac{\omega(x)}{(x-x_j)\omega&#39;(x_j)}}.\tag{5.5}\]</span> 这不是新定义，而是式 <a href="#eq:lagrange-basis">(3.1)</a> 的等价形式；选择它是因为求导更方便。</p>
+<h3 id="非对角元素">非对角元素</h3>
+<p>对式 <a href="#eq:lagrange-omega">(5.5)</a> 求导： <span class="math display">\[\ell_j&#39;(x)=
+  \frac{\omega&#39;(x)(x-x_j)-\omega(x)}
+  {(x-x_j)^2\omega&#39;(x_j)}.\tag{5.6}\]</span> 当 <span class="math inline">\(i\ne j\)</span> 且 <span class="math inline">\(x=x_i\)</span> 时，<span class="math inline">\(\omega(x_i)=0\)</span>，因此 <span class="math display" id="eq:D-general">\[\boxed{
+  D_{ij}=\ell_j&#39;(x_i)
+  =\frac{\omega&#39;(x_i)}{\omega&#39;(x_j)}
+  \frac{1}{x_i-x_j}},
+  \qquad i\ne j.\tag{5.7}\]</span> 若记 <span class="math inline">\(a_i:=\omega&#39;(x_i)\)</span>，也可写成 <span class="math display">\[D_{ij}=\frac{a_i}{a_j}\frac{1}{x_i-x_j}.\tag{5.8}\]</span> 到这里尚未使用 Chebyshev 节点，式 <a href="#eq:D-general">(5.7)</a> 对任意互异节点都成立。</p>
+<h2 id="chebyshevgausslobatto-节点">Chebyshev–Gauss–Lobatto 节点</h2>
+<p>等距节点上的高次全局插值可能在端点附近出现 Runge 振荡。Chebyshev–Gauss–Lobatto（CGL）节点取为 <span class="math display" id="eq:cgl">\[\boxed{x_j=\cos\left(\frac{j\pi}{N}\right)},
+  \qquad j=0,1,\ldots,N.\tag{6.1}\]</span> 它们在端点附近更密，并且包含 <span class="math display">\[x_0=1,\qquad x_N=-1.\tag{6.2}\]</span> 因此 MATLAB 数组的第一个节点是右端点，最后一个节点是左端点。这个顺序在施加非齐次边界条件时尤其重要。</p>
+<h2 id="端点系数与交替符号的完整证明">端点系数与交替符号的完整证明</h2>
+<p>本节证明 <span class="math display" id="eq:omega-ratio">\[\boxed{
+  \frac{\omega&#39;(x_i)}{\omega&#39;(x_j)}
+  =(-1)^{i+j}\frac{c_i}{c_j}},
+  \qquad
+  c_j=\begin{cases}2,&amp;j=0\text{ 或 }j=N,\\1,&amp;1\le j\le N-1.\end{cases}\tag{7.1}\]</span></p>
+<h3 id="第二类-chebyshev-多项式">第二类 Chebyshev 多项式</h3>
+<p>第二类 Chebyshev 多项式满足 <span class="math display" id="eq:U-definition">\[U_{N-1}(\cos\theta)=\frac{\sin(N\theta)}{\sin\theta}.\tag{7.2}\]</span> 对内部节点令 <span class="math inline">\(\theta_j=j\pi/N\)</span>，则 <span class="math display">\[\sin(N\theta_j)=\sin(j\pi)=0,\tag{7.3}\]</span> 故 <span class="math inline">\(U_{N-1}(x_j)=0\)</span>，<span class="math inline">\(j=1,\ldots,N-1\)</span>。再乘上提供两个端点根的 <span class="math inline">\(x^2-1\)</span>，定义 <span class="math display">\[q(x)=(x^2-1)U_{N-1}(x).\tag{7.4}\]</span> <span class="math inline">\(q\)</span> 与 <span class="math inline">\(\omega\)</span> 都是 <span class="math inline">\(N+1\)</span> 次多项式，且具有相同的 <span class="math inline">\(N+1\)</span> 个根，所以存在非零常数 <span class="math inline">\(C\)</span> 使 <span class="math display">\[\omega(x)=Cq(x).\tag{7.5}\]</span> 因而导数比值中的 <span class="math inline">\(C\)</span> 会约掉： <span class="math display">\[\frac{\omega&#39;(x_i)}{\omega&#39;(x_j)}
+  =\frac{q&#39;(x_i)}{q&#39;(x_j)}.\tag{7.6}\]</span></p>
+<h3 id="内部节点上的导数">内部节点上的导数</h3>
+<p>求导得 <span class="math display">\[q&#39;(x)=2xU_{N-1}(x)+(x^2-1)U_{N-1}&#39;(x).\tag{7.7}\]</span> 在内部节点，第一项因 <span class="math inline">\(U_{N-1}(x_j)=0\)</span> 而消失： <span class="math display">\[q&#39;(x_j)=(x_j^2-1)U_{N-1}&#39;(x_j).\tag{7.8}\]</span> 由 <span class="math inline">\(x=\cos\theta\)</span> 和式 <a href="#eq:U-definition">(7.2)</a>， <span class="math display">\[U_{N-1}&#39;(x)
+  =\frac{\dfrac{\mathrm d}{\mathrm d\theta}
+    \left(\dfrac{\sin(N\theta)}{\sin\theta}\right)}
+   {\dfrac{\mathrm dx}{\mathrm d\theta}}.\tag{7.9}\]</span> 其中 <span class="math display">\[\frac{\mathrm dx}{\mathrm d\theta}=-\sin\theta\tag{7.10}\]</span> 且 <span class="math display">\[\frac{\mathrm d}{\mathrm d\theta}
+  \left(\frac{\sin(N\theta)}{\sin\theta}\right)
+  =\frac{N\cos(N\theta)\sin\theta-\sin(N\theta)\cos\theta}
+  {\sin^2\theta}.\tag{7.11}\]</span> 在 <span class="math inline">\(\theta_j=j\pi/N\)</span> 处，利用 <span class="math display">\[\sin(N\theta_j)=0,
+  \qquad \cos(N\theta_j)=(-1)^j,\tag{7.12}\]</span> 得到 <span class="math display">\[U_{N-1}&#39;(x_j)=-\frac{N(-1)^j}{\sin^2\theta_j}.\tag{7.13}\]</span> 再使用 <span class="math inline">\(x_j^2-1=-\sin^2\theta_j\)</span>，可得 <span class="math display" id="eq:q-interior">\[\boxed{q&#39;(x_j)=N(-1)^j},
+  \qquad 1\le j\le N-1.\tag{7.14}\]</span></p>
+<h3 id="端点值为何是-u_n-11n">端点值为何是 <span class="math inline">\(U_{N-1}(1)=N\)</span></h3>
+<p><span class="math inline">\(x=1\)</span> 对应 <span class="math inline">\(\theta=0\)</span>。不能把 <span class="math inline">\(\theta=0\)</span> 直接代入式 <a href="#eq:U-definition">(7.2)</a>，因为会得到 <span class="math inline">\(0/0\)</span>；应取极限： <span class="math display">\[\begin{aligned}U_{N-1}(1)
+  &amp;=\lim_{\theta\to0}\frac{\sin(N\theta)}{\sin\theta}\\
+  &amp;=\lim_{\theta\to0}\frac{N\cos(N\theta)}{\cos\theta}\\
+  &amp;=N.\end{aligned}\tag{7.17}\]</span> 第二行使用了洛必达法则。也可以用小角近似 <span class="math inline">\(\sin(N\theta)\sim N\theta\)</span>、<span class="math inline">\(\sin\theta\sim\theta\)</span> 得到同一结果。</p>
+<h3 id="端点值为何是-u_n-1-1-1n-1n">端点值为何是 <span class="math inline">\(U_{N-1}(-1)=(-1)^{N-1}N\)</span></h3>
+<p><span class="math inline">\(x=-1\)</span> 对应 <span class="math inline">\(\theta=\pi\)</span>。同样必须取极限： <span class="math display" id="eq:U-minus-one">\[\begin{aligned}U_{N-1}(-1)
+  &amp;=\lim_{\theta\to\pi}\frac{\sin(N\theta)}{\sin\theta}\\
+  &amp;=\lim_{\theta\to\pi}\frac{N\cos(N\theta)}{\cos\theta}\\
+  &amp;=\frac{N\cos(N\pi)}{\cos\pi}\\
+  &amp;=\frac{N(-1)^N}{-1}\\
+  &amp;=(-1)^{N-1}N.\end{aligned}\tag{7.22}\]</span> 最后一步成立是因为 <span class="math inline">\(N+1\)</span> 与 <span class="math inline">\(N-1\)</span> 相差 <span class="math inline">\(2\)</span>，故 <span class="math inline">\((-1)^{N+1}=(-1)^{N-1}\)</span>。</p>
+<p>还可用奇偶性检查：<span class="math inline">\(U_n(-x)=(-1)^nU_n(x)\)</span>，所以 <span class="math display">\[U_{N-1}(-1)=(-1)^{N-1}U_{N-1}(1)=(-1)^{N-1}N.\tag{7.23}\]</span></p>
+<h3 id="端点导数与系数-2">端点导数与系数 2</h3>
+<p>由于 <span class="math display">\[q&#39;(x)=2xU_{N-1}(x)+(x^2-1)U_{N-1}&#39;(x),\tag{7.24}\]</span> 在 <span class="math inline">\(x=\pm1\)</span> 处第二项含有 <span class="math inline">\(x^2-1=0\)</span>，所以 <span class="math display">\[\begin{aligned}q&#39;(1)&amp;=2U_{N-1}(1)=2N,\\
+  q&#39;(-1)&amp;=-2U_{N-1}(-1)=2N(-1)^N.\end{aligned}\tag{7.26}\]</span> 与内部结果 <a href="#eq:q-interior">(7.14)</a> 合并： <span class="math display">\[\boxed{q&#39;(x_j)=N(-1)^jc_j},\tag{7.27}\]</span> 其中 <span class="math display">\[c_j=\begin{cases}2,&amp;j=0\text{ 或 }j=N,\\1,&amp;1\le j\le N-1.\end{cases}\tag{7.28}\]</span> 所以 <span class="math inline">\(c_j\)</span> 不是人为的误差修正。它只是统一记录这样一个事实：节点多项式在端点处的导数绝对值为 <span class="math inline">\(2N\)</span>，在内部节点处的导数绝对值为 <span class="math inline">\(N\)</span>。</p>
+<p>最后， <span class="math display">\[\begin{aligned}\frac{\omega&#39;(x_i)}{\omega&#39;(x_j)}
+  &amp;=\frac{CN(-1)^ic_i}{CN(-1)^jc_j}\\
+  &amp;=(-1)^{i-j}\frac{c_i}{c_j}\\
+  &amp;=(-1)^{i+j}\frac{c_i}{c_j},\end{aligned}\tag{7.31}\]</span> 因为 <span class="math inline">\((-1)^{-j}=(-1)^j\)</span>，或者说 <span class="math inline">\(i-j\)</span> 与 <span class="math inline">\(i+j\)</span> 相差偶数 <span class="math inline">\(2j\)</span>。这就证明了式 <a href="#eq:omega-ratio">(7.1)</a>。</p>
+<h2 id="chebyshev-微分矩阵">Chebyshev 微分矩阵</h2>
+<p>把式 <a href="#eq:omega-ratio">(7.1)</a> 代入一般公式 <a href="#eq:D-general">(5.7)</a>，得到非对角元素 <span class="math display" id="eq:D-offdiag">\[\boxed{
+  D_{ij}=\frac{c_i}{c_j}
+  \frac{(-1)^{i+j}}{x_i-x_j}},
+  \qquad i\ne j.\tag{8.1}\]</span></p>
+<h3 id="对角元为何取负行和">对角元为何取负行和</h3>
+<p>当 <span class="math inline">\(i=j\)</span> 时，式 <a href="#eq:D-offdiag">(8.1)</a> 的分母为零，不能直接使用。考虑常函数 <span class="math inline">\(u(x)\equiv1\)</span>。其插值多项式仍为常数，导数必须为零： <span class="math display">\[D\boldsymbol{1}=\boldsymbol{0}.\tag{8.2}\]</span> 这表示 <span class="math inline">\(D\)</span> 每一行元素之和为零： <span class="math display">\[\sum_{j=0}^N D_{ij}=0.\tag{8.3}\]</span> 因此 <span class="math display" id="eq:D-diagonal">\[\boxed{D_{ii}=-\sum_{\substack{j=0\\j\ne i}}^N D_{ij}}.\tag{8.4}\]</span> 负行和并不是经验技巧，而是精确保持 <span class="math inline">\(\mathrm d(1)/\mathrm dx=0\)</span> 的代数条件。</p>
+<h3 id="最小例子n2">最小例子：<span class="math inline">\(N=2\)</span></h3>
+<p>三个节点为 <span class="math display">\[x_0=1,\qquad x_1=0,\qquad x_2=-1,\tag{8.5}\]</span> 微分矩阵为 <span class="math display">\[D=\begin{bmatrix}
+  \frac32&amp;-2&amp;\frac12\\[3pt]
+  \frac12&amp;0&amp;-\frac12\\[3pt]
+  -\frac12&amp;2&amp;-\frac32
+  \end{bmatrix}.\tag{8.6}\]</span> 它满足 <span class="math display">\[D\begin{bmatrix}1\\1\\1\end{bmatrix}
+  =\begin{bmatrix}0\\0\\0\end{bmatrix},\tag{8.7}\]</span> 并且对 <span class="math inline">\(u(x)=x^2\)</span>， <span class="math display">\[D\begin{bmatrix}1\\0\\1\end{bmatrix}
+  =\begin{bmatrix}2\\0\\-2\end{bmatrix},\tag{8.8}\]</span> 恰好等于 <span class="math inline">\(u&#39;(x)=2x\)</span> 在节点 <span class="math inline">\(1,0,-1\)</span> 上的值。一般地，<span class="math inline">\(D\)</span> 对次数不超过 <span class="math inline">\(N\)</span> 的多项式的一阶导数是精确的（忽略浮点舍入误差）。</p>
+<h2 id="matlab-实现及逐行解释">MATLAB 实现及逐行解释</h2>
+<pre data-caption="Chebyshev 一阶微分矩阵"><code>function [D, x] = cheb(N)
+% CHEB 构造 CGL 节点和一阶谱微分矩阵。
+% 若 u(j+1)=u(x_j)，则 D*u 是插值多项式在节点处的导数。
+
+    if N == 0
+        D = 0;
+        x = 1;
+        return
+    end
+
+    % x_0=1, x_N=-1，共 N+1 个节点
+    x = cos(pi*(0:N)&#39;/N);
+
+    % 代码变量 c 实际存储 c_j*(-1)^j
+    c = [2; ones(N-1,1); 2] .* (-1).^(0:N)&#39;;
+
+    % dX(i,j)=x_i-x_j（数学下标比 MATLAB 下标小 1）
+    X  = repmat(x,1,N+1);
+    dX = X-X&#39;;
+
+    % 构造非对角元素；eye 暂时防止对角位置除以零
+    D = (c*(1./c)&#39;) ./ (dX+eye(N+1));
+
+    % 以负行和替换临时对角元
+    D = D-diag(sum(D,2));
+end</code></pre>
+<p>代码中的变量 <code>c</code> 已把数学上的 <span class="math inline">\(c_j\)</span> 与 <span class="math inline">\((-1)^j\)</span> 合并。若记 <span class="math display">\[\widetilde c_j=c_j(-1)^j,\tag{9.1}\]</span> 则外积 <code>c*(1./c)’</code> 的第 <span class="math inline">\((i,j)\)</span> 个元素为 <span class="math display">\[\frac{\widetilde c_i}{\widetilde c_j}
+  =\frac{c_i}{c_j}(-1)^{i-j}
+  =\frac{c_i}{c_j}(-1)^{i+j}.\tag{9.2}\]</span> 再逐元素除以 <code>dX</code>，正好得到式 <a href="#eq:D-offdiag">(8.1)</a>。</p>
+<p>在 <code>dX+eye(N+1)</code> 中加入单位矩阵，只是把对角分母临时从 <span class="math inline">\(0\)</span> 改为 <span class="math inline">\(1\)</span>；下一行会重新计算全部对角元。若临时矩阵记为 <span class="math inline">\(\widetilde D\)</span>，则 <span class="math display">\[D_{ii}=\widetilde D_{ii}-\sum_{j=0}^N\widetilde D_{ij}
+  =-\sum_{j\ne i}\widetilde D_{ij},\tag{9.3}\]</span> 所以无论临时对角元是多少，最终都会被负行和替换。</p>
+<h2 id="高阶导数矩阵">高阶导数矩阵</h2>
+<p>由 <span class="math display">\[\boldsymbol{u}&#39;\approx D\boldsymbol{u}\tag{10.1}\]</span> 再作用一次 <span class="math inline">\(D\)</span>： <span class="math display">\[\boldsymbol{u}&#39;&#39;\approx D\boldsymbol{u}&#39;\approx D(D\boldsymbol{u})=D^2\boldsymbol{u}.\tag{10.2}\]</span> 因此二阶微分矩阵写作 <span class="math display">\[\boxed{D_2=D^2}.\tag{10.3}\]</span> MATLAB 中应使用矩阵乘法 <code>D*D</code> 或 <code>D^2</code>，不能使用 <code>D.^2</code>；后者只是把每个元素分别平方。</p>
+<h2 id="经典例子一维-poisson-边值问题">经典例子：一维 Poisson 边值问题</h2>
+<p>考虑 <span class="math display" id="eq:poisson">\[u&#39;&#39;(x)=e^{4x},\qquad -1&lt;x&lt;1,\tag{11.1}\]</span> 以及齐次 Dirichlet 边界条件 <span class="math display">\[u(-1)=u(1)=0.\tag{11.2}\]</span> 两次积分可得通解 <span class="math display">\[u(x)=\frac{e^{4x}}{16}+C_1x+C_2.\tag{11.3}\]</span> 代入两个边界条件求得 <span class="math display">\[C_1=-\frac{\sinh4}{16},
+  \qquad C_2=-\frac{\cosh4}{16},\tag{11.4}\]</span> 故解析解为 <span class="math display">\[\boxed{u(x)=\frac{e^{4x}-x\sinh4-\cosh4}{16}}.\tag{11.5}\]</span></p>
+<h3 id="离散方程与边界条件">离散方程与边界条件</h3>
+<p>在全部节点上，式 <a href="#eq:poisson">(11.1)</a> 离散为 <span class="math display">\[D^2\boldsymbol{u}\approx\boldsymbol{f}.\tag{11.6}\]</span> 记内部未知量为 <span class="math display">\[\boldsymbol{u}_{\mathrm{in}}=
+  \begin{bmatrix}u_1&amp;\cdots&amp;u_{N-1}\end{bmatrix}^{\mathsf T}.\tag{11.7}\]</span> 内部行可以写成 <span class="math display">\[D^2_{\mathrm{in},\mathrm{in}}\boldsymbol{u}_{\mathrm{in}}
+  +D^2_{\mathrm{in},0}u_0
+  +D^2_{\mathrm{in},N}u_N
+  =\boldsymbol{f}_{\mathrm{in}}.\tag{11.8}\]</span> 本例中 <span class="math inline">\(u_0=u(1)=0\)</span>、<span class="math inline">\(u_N=u(-1)=0\)</span>，所以边界列对应的项消失，只需解 <span class="math display">\[D^2_{\mathrm{in},\mathrm{in}}\boldsymbol{u}_{\mathrm{in}}
+  =\boldsymbol{f}_{\mathrm{in}}.\tag{11.9}\]</span></p>
+<pre data-caption="Poisson 边值问题求解程序"><code>clear; clc; close all;
+
+N = 16;
+[D,x] = cheb(N);
+D2 = D^2;
+
+% MATLAB 的 2:N 对应数学下标 1,...,N-1
+A = D2(2:N,2:N);
+f = exp(4*x(2:N));
+
+u_inner = A\f;
+u = [0;u_inner;0];
+
+u_exact = (exp(4*x)-x*sinh(4)-cosh(4))/16;
+err_inf = norm(u-u_exact,inf);
+fprintf(&#39;N=%d, 最大节点误差=%.3e\n&#39;,N,err_inf);
+
+% x 原本从 1 排到 -1；绘图前升序排列
+[x_plot,idx] = sort(x);
+plot(x_plot,u_exact(idx),&#39;k-&#39;,&#39;LineWidth&#39;,1.5); hold on;
+plot(x_plot,u(idx),&#39;ro&#39;,&#39;MarkerSize&#39;,6);
+grid on;
+xlabel(&#39;x&#39;); ylabel(&#39;u(x)&#39;);
+legend(&#39;解析解&#39;,&#39;谱方法节点解&#39;,&#39;Location&#39;,&#39;best&#39;);</code></pre>
+<h3 id="非齐次边界条件">非齐次边界条件</h3>
+<p>若 <span class="math display">\[u(1)=\alpha,\qquad u(-1)=\beta,\tag{11.10}\]</span> 由于节点顺序为 <span class="math inline">\(x_0=1\)</span>、<span class="math inline">\(x_N=-1\)</span>，内部右端项必须改为 <span class="math display">\[\boldsymbol{f}_{\mathrm{in}}
+  -D^2_{\mathrm{in},0}\alpha
+  -D^2_{\mathrm{in},N}\beta.\tag{11.11}\]</span> 对应代码为</p>
+<pre><code>rhs = f - D2(2:N,1)*alpha - D2(2:N,N+1)*beta;
+u_inner = D2(2:N,2:N)\rhs;
+u = [alpha;u_inner;beta];</code></pre>
+<p>非齐次边界下不能只删掉首尾两列而不修改右端项。</p>
+<h2 id="验证微分矩阵">验证微分矩阵</h2>
+<p>在求解微分方程前，先验证 <span class="math inline">\(D\)</span> 的基本性质。对于次数不超过 <span class="math inline">\(N\)</span> 的多项式，<span class="math inline">\(D\)</span> 应在浮点舍入范围内给出精确导数。</p>
+<pre data-caption="微分矩阵自检"><code>clear; clc;
+N = 8;
+[D,x] = cheb(N);
+
+err_const = norm(D*ones(size(x)),inf);
+err_x     = norm(D*x-ones(size(x)),inf);
+err_x2    = norm(D*(x.^2)-2*x,inf);
+err_xN    = norm(D*(x.^N)-N*x.^(N-1),inf);
+
+fprintf(&#39;常函数误差 = %.3e\n&#39;,err_const);
+fprintf(&#39;x 导数误差 = %.3e\n&#39;,err_x);
+fprintf(&#39;x^2 导数误差 = %.3e\n&#39;,err_x2);
+fprintf(&#39;x^N 导数误差 = %.3e\n&#39;,err_xN);</code></pre>
+<p>还可检查 <span class="math display">\[\lVert D\boldsymbol{1}\rVert_\infty\tag{12.1}\]</span> 是否接近机器精度。若它明显不小，通常意味着差矩阵方向、权重比值或对角元处理有误。</p>
+<h2 id="谱收敛实验">谱收敛实验</h2>
+<p>对光滑或解析函数，Chebyshev 谱方法的误差通常随 <span class="math inline">\(N\)</span> 快速下降，常表现为指数型或几何型收敛，直到舍入误差和矩阵条件数开始主导。</p>
+<pre data-caption="误差随 $N$ 的变化"><code>Nvec = 2:2:40;
+err = zeros(size(Nvec));
+
+for k = 1:numel(Nvec)
+    N = Nvec(k);
+    [D,x] = cheb(N);
+    D2 = D^2;
+    f = exp(4*x(2:N));
+    u = [0;D2(2:N,2:N)\f;0];
+    ue = (exp(4*x)-x*sinh(4)-cosh(4))/16;
+    err(k) = norm(u-ue,inf);
+end
+
+semilogy(Nvec,err,&#39;o-&#39;);
+grid on;
+xlabel(&#39;N&#39;); ylabel(&#39;最大节点误差&#39;);
+title(&#39;Chebyshev 谱配置法的收敛&#39;);</code></pre>
+<p>半对数坐标上若误差在一段区间内近似直线下降，说明误差大致满足 <span class="math inline">\(C\rho^{-N}\)</span>，其中 <span class="math inline">\(\rho&gt;1\)</span>。误差触及约 <span class="math inline">\(10^{-14}\)</span> 附近后不再下降，并不表示理论失效，而通常是双精度舍入误差已经成为主要误差源。</p>
+<h2 id="常见混淆与排错">常见混淆与排错</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">混淆</th>
+<th style="text-align: left;">正确理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(\ell_j(x_i)=\delta_{ij}\)</span> 是否说明 <span class="math inline">\(\ell_j\)</span> 恒为零？</td>
+<td style="text-align: left;">不说明。它只规定有限个节点上的取值；在自己的节点处为 <span class="math inline">\(1\)</span>，节点之间一般非零。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(D\)</span> 是原函数的精确导数算子吗？</td>
+<td style="text-align: left;"><span class="math inline">\(D\)</span> 精确求的是插值多项式 <span class="math inline">\(p_N\)</span> 在节点上的导数。它对原函数导数的准确程度取决于插值误差和函数光滑性。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(c_0=c_N=2\)</span> 是经验修正吗？</td>
+<td style="text-align: left;">不是。它来自 <span class="math inline">\(q&#39;(\pm1)\)</span> 的绝对值为 <span class="math inline">\(2N\)</span>，而内部 <span class="math inline">\(q&#39;(x_j)\)</span> 的绝对值为 <span class="math inline">\(N\)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;">为什么代码里的 <code>c</code> 有正负号？</td>
+<td style="text-align: left;">代码把数学上的端点系数 <span class="math inline">\(c_j\)</span> 和交替因子 <span class="math inline">\((-1)^j\)</span> 合并为一个向量。</td>
+</tr>
+<tr>
+<td style="text-align: left;">为什么 <span class="math inline">\(D\)</span> 是稠密的？</td>
+<td style="text-align: left;">因为每个 Lagrange 基函数是全局多项式，一个节点值会影响整条插值曲线。</td>
+</tr>
+<tr>
+<td style="text-align: left;">为什么 <span class="math inline">\(D^2\)</span> 不是逐元素平方？</td>
+<td style="text-align: left;">连续求导对应线性算子的复合，因此是矩阵乘法 <span class="math inline">\(D D\)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;">为什么结果符号全部相反？</td>
+<td style="text-align: left;">最常见原因是把 <span class="math inline">\(x_i-x_j\)</span> 写成了 <span class="math inline">\(x_j-x_i\)</span>，或节点顺序与公式约定不一致。用 <span class="math inline">\(D\boldsymbol{x}=\boldsymbol{1}\)</span> 检查。</td>
+</tr>
+<tr>
+<td style="text-align: left;">为什么非齐次边界结果不对？</td>
+<td style="text-align: left;">删除边界列前，必须把这些列乘已知边界值后移到右端。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="符号表">符号表</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(N\)</span></td>
+<td style="text-align: left;">插值多项式最高次数；节点总数为 <span class="math inline">\(N+1\)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(i,j,k,m\)</span></td>
+<td style="text-align: left;">节点或连乘、求和指标，数学下标从 <span class="math inline">\(0\)</span> 开始。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(x_j\)</span></td>
+<td style="text-align: left;">第 <span class="math inline">\(j\)</span> 个节点；CGL 节点为 <span class="math inline">\(\cos(j\pi/N)\)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(u_j\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(u(x_j)\)</span>，原函数在第 <span class="math inline">\(j\)</span> 个节点上的值。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(p_N(x)\)</span></td>
+<td style="text-align: left;">穿过全部节点值的次数不超过 <span class="math inline">\(N\)</span> 的插值多项式。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(\ell_j(x)\)</span></td>
+<td style="text-align: left;">第 <span class="math inline">\(j\)</span> 个 Lagrange 基函数。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(\delta_{ij}\)</span></td>
+<td style="text-align: left;">Kronecker 符号；<span class="math inline">\(i=j\)</span> 时为 <span class="math inline">\(1\)</span>，否则为 <span class="math inline">\(0\)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(\omega(x)\)</span></td>
+<td style="text-align: left;">节点多项式 <span class="math inline">\(\prod_{k=0}^N(x-x_k)\)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(D_{ij}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\ell_j&#39;(x_i)\)</span>，一阶微分矩阵第 <span class="math inline">\(i\)</span> 行第 <span class="math inline">\(j\)</span> 列。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(U_n(x)\)</span></td>
+<td style="text-align: left;">第二类 Chebyshev 多项式。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(c_j\)</span></td>
+<td style="text-align: left;">端点修正系数；端点为 <span class="math inline">\(2\)</span>，内部为 <span class="math inline">\(1\)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(D^2\)</span></td>
+<td style="text-align: left;">一阶微分矩阵的矩阵平方，用于二阶导数。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(\lVert\cdot\rVert_\infty\)</span></td>
+<td style="text-align: left;">向量分量绝对值的最大值。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="建议练习">建议练习</h2>
+<ol>
+<li><p>手算 <span class="math inline">\(N=2\)</span> 时全部 <span class="math inline">\(D_{ij}\)</span>，并验证 <span class="math inline">\(D\boldsymbol{1}=0\)</span>、<span class="math inline">\(D\boldsymbol{x}=\boldsymbol{1}\)</span>。</p></li>
+<li><p>用程序验证 <span class="math inline">\(D(x^m)=m x^{m-1}\)</span>，其中 <span class="math inline">\(m=0,1,\ldots,N\)</span>。</p></li>
+<li><p>把方程改为 <span class="math inline">\(-u&#39;&#39;+u=f\)</span>，写出离散矩阵 <span class="math inline">\(-D^2+I\)</span>。</p></li>
+<li><p>取非齐次边界 <span class="math inline">\(u(1)=1\)</span>、<span class="math inline">\(u(-1)=2\)</span>，验证右端修正项。</p></li>
+<li><p>比较 Chebyshev 谱方法与二阶中心差分的误差随节点数变化。</p></li>
+<li><p>解释当函数不光滑时，为什么谱收敛速度会显著下降。</p></li>
+</ol>
+<h2 id="核心结论">核心结论</h2>
+<p>整套方法最重要的三条公式是 <span class="math display">\[\boxed{D_{ij}=\ell_j&#39;(x_i)},\tag{17.1}\]</span> 它定义了微分矩阵的本质； <span class="math display">\[\boxed{
+  D_{ij}=\frac{c_i}{c_j}
+  \frac{(-1)^{i+j}}{x_i-x_j},\quad i\ne j},\tag{17.2}\]</span> 它给出了 CGL 节点上的非对角元素；以及 <span class="math display">\[\boxed{D_{ii}=-\sum_{j\ne i}D_{ij}},\tag{17.3}\]</span> 它由常函数导数为零确定对角元素。</p>
+<p>从思想上说，谱配置法完成了如下转换： <span class="math display">\[\boxed{\text{微积分中的求导}\quad\longrightarrow\quad\text{线性代数中的矩阵乘法}}.\]</span></p>
+</div></section></article><p class="study-back"><a href="/notes/">← 返回学习笔记</a></p></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2019 – 2025 </span><span class="with-love" id="animate"><span class="icon iconify" data-icon="ri:cloud-line"></span></span><span class="author"> Misty Sigh</span></div><div class="powered"><span>Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> v7.3.0</span><span class="footer-separator">|</span><span>Theme - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.10.11</span></div></footer></div><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><span class="icon iconify" data-icon="ri:arrow-up-s-line"></span><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a><script src="https://fastly.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script><script>const images = [...document.querySelectorAll('.markdown-body img')]
+mediumZoom(images)</script><style>.medium-zoom-image {
+  z-index: 99;
+}</style></body></html>

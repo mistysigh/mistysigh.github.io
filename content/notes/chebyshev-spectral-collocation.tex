@@ -1,0 +1,744 @@
+\documentclass[11pt,a4paper]{ctexart}
+
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,array,longtable}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\hypersetup{colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!60!black}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.25em}
+\numberwithin{equation}{section}
+
+\definecolor{codebg}{RGB}{247,248,250}
+\definecolor{codegreen}{RGB}{20,110,70}
+\definecolor{codeblue}{RGB}{30,70,160}
+\lstset{
+  language=Matlab,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{codeblue}\bfseries,
+  commentstyle=\color{codegreen},
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{black!20},
+  numbers=left,
+  numberstyle=\tiny\color{black!55},
+  stepnumber=1,
+  numbersep=8pt,
+  breaklines=true,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  tabsize=4
+}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\ii}{\mathrm{i}}
+
+\title{从零理解 Chebyshev 谱配置法\\
+\large Lagrange 插值、谱微分矩阵与一维 Poisson 边值问题}
+\author{学习手册}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{学习目标与总体路线}
+
+本手册从一个具体问题出发：只知道函数在有限个节点上的值，怎样计算这些节点上的导数，并进一步求解微分方程？最终目标是理解并实现
+\begin{equation}
+  \vect{u}'\approx D\vect{u},
+  \qquad
+  \vect{u}''\approx D^2\vect{u}.
+\end{equation}
+这里的关键对象是谱微分矩阵 $D$。整条逻辑链为
+\begin{equation*}
+\text{节点值}
+\longrightarrow \text{全局插值多项式}
+\longrightarrow \text{对插值多项式求导}
+\longrightarrow \text{微分矩阵}
+\longrightarrow \text{代数方程组}.
+\end{equation*}
+
+读完后应能回答以下问题：
+\begin{enumerate}[label=\arabic*.]
+  \item 为什么选择 Lagrange 基函数？
+  \item $D_{ij}=\ell_j'(x_i)$ 的行、列分别表示什么？
+  \item Chebyshev 节点为什么会产生 $(-1)^{i+j}$？
+  \item 为什么端点修正系数为 $c_0=c_N=2$？
+  \item 为什么对角元可以取非对角元的负行和？
+  \item 为什么二阶导数矩阵是 $D^2$ 而不是 $D.^2$？
+\end{enumerate}
+
+\section{从连续函数到节点值}
+
+设函数 $u(x)$ 定义在 $[-1,1]$ 上。计算机不能保存连续函数的全部信息，因此选取 $N+1$ 个互异节点
+\begin{equation}
+  x_0,x_1,\ldots,x_N
+\end{equation}
+并保存节点值
+\begin{equation}
+  u_j:=u(x_j),\qquad j=0,1,\ldots,N.
+\end{equation}
+组成向量
+\begin{equation}
+  \vect{u}
+  =\begin{bmatrix}u_0&u_1&\cdots&u_N\end{bmatrix}^{\mathsf T}.
+\end{equation}
+
+谱配置法不直接对离散数据做局部差分，而是先构造次数不超过 $N$ 的全局多项式 $p_N(x)$，使得
+\begin{equation}
+  p_N(x_j)=u_j,\qquad j=0,1,\ldots,N.
+\end{equation}
+然后使用
+\begin{equation}
+  u'(x_i)\approx p_N'(x_i).
+\end{equation}
+需要明确：我们对 $p_N$ 的求导是精确的；近似发生在用 $p_N$ 代替原函数 $u$ 这一步。
+
+\section{Lagrange 基函数：让系数直接等于节点值}
+
+\subsection{定义}
+
+第 $j$ 个 Lagrange 基函数定义为
+\begin{equation}
+  \boxed{
+  \ell_j(x)=
+  \prod_{\substack{k=0\\k\ne j}}^N
+  \frac{x-x_k}{x_j-x_k}}
+  \label{eq:lagrange-basis}
+\end{equation}
+其中 $j$ 固定，$k$ 是连乘指标。
+
+当 $x=x_i$ 且 $i\ne j$ 时，分子中包含因子 $x_i-x_i=0$，因此
+\begin{equation}
+  \ell_j(x_i)=0.
+\end{equation}
+当 $x=x_j$ 时，式~\eqref{eq:lagrange-basis} 中每个分子都等于对应分母，因此
+\begin{equation}
+  \ell_j(x_j)=1.
+\end{equation}
+统一写成
+\begin{equation}
+  \boxed{\ell_j(x_i)=\delta_{ij}},
+  \qquad
+  \delta_{ij}=\begin{cases}1,&i=j,\\0,&i\ne j.\end{cases}
+\end{equation}
+
+这个等式只描述有限个节点处的取值，并不表示 $\ell_j(x)$ 恒为零。固定 $j$ 后，$\ell_j$ 在自己的节点处为 $1$，在另外 $N$ 个节点处为 $0$，在节点之间一般不为零。
+
+\subsection{插值多项式}
+
+定义
+\begin{equation}
+  \boxed{p_N(x)=\sum_{j=0}^N u_j\ell_j(x)}.
+  \label{eq:interpolant}
+\end{equation}
+在节点 $x_i$ 处，
+\begin{equation}
+  p_N(x_i)=\sum_{j=0}^N u_j\delta_{ij}=u_i.
+\end{equation}
+因此，式~\eqref{eq:interpolant} 自动穿过全部节点。选择 Lagrange 基的思想动机正是：展开系数 $u_j$ 直接就是具有物理意义的节点值，不需要再从单项式系数反解节点值。
+
+\section{微分矩阵的定义与意义}
+
+对式~\eqref{eq:interpolant} 求导：
+\begin{equation}
+  p_N'(x)=\sum_{j=0}^N u_j\ell_j'(x).
+\end{equation}
+在 $x_i$ 处计算：
+\begin{equation}
+  p_N'(x_i)=\sum_{j=0}^N \ell_j'(x_i)u_j.
+\end{equation}
+定义
+\begin{equation}
+  \boxed{D_{ij}:=\ell_j'(x_i)}.
+  \label{eq:D-definition}
+\end{equation}
+于是
+\begin{equation}
+  \boxed{p_N'(x_i)=\sum_{j=0}^N D_{ij}u_j},
+  \qquad
+  \boxed{\vect{u}'\approx D\vect{u}}.
+\end{equation}
+
+在 $D_{ij}$ 中：
+\begin{itemize}
+  \item 行指标 $i$ 表示在哪个节点 $x_i$ 计算导数；
+  \item 列指标 $j$ 表示节点值 $u_j$ 对该导数的贡献；
+  \item 第 $i$ 行给出 $p_N'(x_i)$ 对全部节点值的线性组合。
+\end{itemize}
+因此谱微分是全局的：通常 $D$ 是稠密矩阵，一个节点处的导数使用全部节点值。
+
+\section{任意节点上的微分矩阵公式}
+
+\subsection{节点多项式}
+
+定义节点多项式
+\begin{equation}
+  \omega(x)=\prod_{k=0}^N(x-x_k).
+\end{equation}
+把第 $j$ 个因子提出：
+\begin{equation}
+  \omega(x)=(x-x_j)\prod_{k\ne j}(x-x_k).
+\end{equation}
+另一方面，由乘积求导法则，
+\begin{equation}
+  \omega'(x)=\sum_{m=0}^N\prod_{k\ne m}(x-x_k).
+\end{equation}
+令 $x=x_j$。当 $m\ne j$ 时，相应乘积含有 $x_j-x_j$，故整项为零；只有 $m=j$ 的一项保留：
+\begin{equation}
+  \omega'(x_j)=\prod_{k\ne j}(x_j-x_k).
+\end{equation}
+所以 Lagrange 基可改写为
+\begin{equation}
+  \boxed{
+  \ell_j(x)=\frac{\omega(x)}{(x-x_j)\omega'(x_j)}}.
+  \label{eq:lagrange-omega}
+\end{equation}
+这不是新定义，而是式~\eqref{eq:lagrange-basis} 的等价形式；选择它是因为求导更方便。
+
+\subsection{非对角元素}
+
+对式~\eqref{eq:lagrange-omega} 求导：
+\begin{equation}
+  \ell_j'(x)=
+  \frac{\omega'(x)(x-x_j)-\omega(x)}
+  {(x-x_j)^2\omega'(x_j)}.
+\end{equation}
+当 $i\ne j$ 且 $x=x_i$ 时，$\omega(x_i)=0$，因此
+\begin{equation}
+  \boxed{
+  D_{ij}=\ell_j'(x_i)
+  =\frac{\omega'(x_i)}{\omega'(x_j)}
+  \frac{1}{x_i-x_j}},
+  \qquad i\ne j.
+  \label{eq:D-general}
+\end{equation}
+若记 $a_i:=\omega'(x_i)$，也可写成
+\begin{equation}
+  D_{ij}=\frac{a_i}{a_j}\frac{1}{x_i-x_j}.
+\end{equation}
+到这里尚未使用 Chebyshev 节点，式~\eqref{eq:D-general} 对任意互异节点都成立。
+
+\section{Chebyshev--Gauss--Lobatto 节点}
+
+等距节点上的高次全局插值可能在端点附近出现 Runge 振荡。Chebyshev--Gauss--Lobatto（CGL）节点取为
+\begin{equation}
+  \boxed{x_j=\cos\left(\frac{j\pi}{N}\right)},
+  \qquad j=0,1,\ldots,N.
+  \label{eq:cgl}
+\end{equation}
+它们在端点附近更密，并且包含
+\begin{equation}
+  x_0=1,\qquad x_N=-1.
+\end{equation}
+因此 MATLAB 数组的第一个节点是右端点，最后一个节点是左端点。这个顺序在施加非齐次边界条件时尤其重要。
+
+\section{端点系数与交替符号的完整证明}
+
+本节证明
+\begin{equation}
+  \boxed{
+  \frac{\omega'(x_i)}{\omega'(x_j)}
+  =(-1)^{i+j}\frac{c_i}{c_j}},
+  \qquad
+  c_j=\begin{cases}2,&j=0\text{ 或 }j=N,\\1,&1\le j\le N-1.\end{cases}
+  \label{eq:omega-ratio}
+\end{equation}
+
+\subsection{第二类 Chebyshev 多项式}
+
+第二类 Chebyshev 多项式满足
+\begin{equation}
+  U_{N-1}(\cos\theta)=\frac{\sin(N\theta)}{\sin\theta}.
+  \label{eq:U-definition}
+\end{equation}
+对内部节点令 $\theta_j=j\pi/N$，则
+\begin{equation}
+  \sin(N\theta_j)=\sin(j\pi)=0,
+\end{equation}
+故 $U_{N-1}(x_j)=0$，$j=1,\ldots,N-1$。再乘上提供两个端点根的 $x^2-1$，定义
+\begin{equation}
+  q(x)=(x^2-1)U_{N-1}(x).
+\end{equation}
+$q$ 与 $\omega$ 都是 $N+1$ 次多项式，且具有相同的 $N+1$ 个根，所以存在非零常数 $C$ 使
+\begin{equation}
+  \omega(x)=Cq(x).
+\end{equation}
+因而导数比值中的 $C$ 会约掉：
+\begin{equation}
+  \frac{\omega'(x_i)}{\omega'(x_j)}
+  =\frac{q'(x_i)}{q'(x_j)}.
+\end{equation}
+
+\subsection{内部节点上的导数}
+
+求导得
+\begin{equation}
+  q'(x)=2xU_{N-1}(x)+(x^2-1)U_{N-1}'(x).
+\end{equation}
+在内部节点，第一项因 $U_{N-1}(x_j)=0$ 而消失：
+\begin{equation}
+  q'(x_j)=(x_j^2-1)U_{N-1}'(x_j).
+\end{equation}
+由 $x=\cos\theta$ 和式~\eqref{eq:U-definition}，
+\begin{equation}
+  U_{N-1}'(x)
+  =\frac{\dfrac{\mathrm d}{\mathrm d\theta}
+    \left(\dfrac{\sin(N\theta)}{\sin\theta}\right)}
+   {\dfrac{\mathrm dx}{\mathrm d\theta}}.
+\end{equation}
+其中
+\begin{equation}
+  \frac{\mathrm dx}{\mathrm d\theta}=-\sin\theta
+\end{equation}
+且
+\begin{equation}
+  \frac{\mathrm d}{\mathrm d\theta}
+  \left(\frac{\sin(N\theta)}{\sin\theta}\right)
+  =\frac{N\cos(N\theta)\sin\theta-\sin(N\theta)\cos\theta}
+  {\sin^2\theta}.
+\end{equation}
+在 $\theta_j=j\pi/N$ 处，利用
+\begin{equation}
+  \sin(N\theta_j)=0,
+  \qquad \cos(N\theta_j)=(-1)^j,
+\end{equation}
+得到
+\begin{equation}
+  U_{N-1}'(x_j)=-\frac{N(-1)^j}{\sin^2\theta_j}.
+\end{equation}
+再使用 $x_j^2-1=-\sin^2\theta_j$，可得
+\begin{equation}
+  \boxed{q'(x_j)=N(-1)^j},
+  \qquad 1\le j\le N-1.
+  \label{eq:q-interior}
+\end{equation}
+
+\subsection{端点值为何是 $U_{N-1}(1)=N$}
+
+$x=1$ 对应 $\theta=0$。不能把 $\theta=0$ 直接代入式~\eqref{eq:U-definition}，因为会得到 $0/0$；应取极限：
+\begin{align}
+  U_{N-1}(1)
+  &=\lim_{\theta\to0}\frac{\sin(N\theta)}{\sin\theta}\\
+  &=\lim_{\theta\to0}\frac{N\cos(N\theta)}{\cos\theta}\\
+  &=N.
+\end{align}
+第二行使用了洛必达法则。也可以用小角近似 $\sin(N\theta)\sim N\theta$、$\sin\theta\sim\theta$ 得到同一结果。
+
+\subsection{端点值为何是 $U_{N-1}(-1)=(-1)^{N-1}N$}
+
+$x=-1$ 对应 $\theta=\pi$。同样必须取极限：
+\begin{align}
+  U_{N-1}(-1)
+  &=\lim_{\theta\to\pi}\frac{\sin(N\theta)}{\sin\theta}\\
+  &=\lim_{\theta\to\pi}\frac{N\cos(N\theta)}{\cos\theta}\\
+  &=\frac{N\cos(N\pi)}{\cos\pi}\\
+  &=\frac{N(-1)^N}{-1}\\
+  &=(-1)^{N-1}N.
+  \label{eq:U-minus-one}
+\end{align}
+最后一步成立是因为 $N+1$ 与 $N-1$ 相差 $2$，故 $(-1)^{N+1}=(-1)^{N-1}$。
+
+还可用奇偶性检查：$U_n(-x)=(-1)^nU_n(x)$，所以
+\begin{equation}
+  U_{N-1}(-1)=(-1)^{N-1}U_{N-1}(1)=(-1)^{N-1}N.
+\end{equation}
+
+\subsection{端点导数与系数 2}
+
+由于
+\begin{equation}
+  q'(x)=2xU_{N-1}(x)+(x^2-1)U_{N-1}'(x),
+\end{equation}
+在 $x=\pm1$ 处第二项含有 $x^2-1=0$，所以
+\begin{align}
+  q'(1)&=2U_{N-1}(1)=2N,\\
+  q'(-1)&=-2U_{N-1}(-1)=2N(-1)^N.
+\end{align}
+与内部结果~\eqref{eq:q-interior} 合并：
+\begin{equation}
+  \boxed{q'(x_j)=N(-1)^jc_j},
+\end{equation}
+其中
+\begin{equation}
+  c_j=\begin{cases}2,&j=0\text{ 或 }j=N,\\1,&1\le j\le N-1.\end{cases}
+\end{equation}
+所以 $c_j$ 不是人为的误差修正。它只是统一记录这样一个事实：节点多项式在端点处的导数绝对值为 $2N$，在内部节点处的导数绝对值为 $N$。
+
+最后，
+\begin{align}
+  \frac{\omega'(x_i)}{\omega'(x_j)}
+  &=\frac{CN(-1)^ic_i}{CN(-1)^jc_j}\\
+  &=(-1)^{i-j}\frac{c_i}{c_j}\\
+  &=(-1)^{i+j}\frac{c_i}{c_j},
+\end{align}
+因为 $(-1)^{-j}=(-1)^j$，或者说 $i-j$ 与 $i+j$ 相差偶数 $2j$。这就证明了式~\eqref{eq:omega-ratio}。
+
+\section{Chebyshev 微分矩阵}
+
+把式~\eqref{eq:omega-ratio} 代入一般公式~\eqref{eq:D-general}，得到非对角元素
+\begin{equation}
+  \boxed{
+  D_{ij}=\frac{c_i}{c_j}
+  \frac{(-1)^{i+j}}{x_i-x_j}},
+  \qquad i\ne j.
+  \label{eq:D-offdiag}
+\end{equation}
+
+\subsection{对角元为何取负行和}
+
+当 $i=j$ 时，式~\eqref{eq:D-offdiag} 的分母为零，不能直接使用。考虑常函数 $u(x)\equiv1$。其插值多项式仍为常数，导数必须为零：
+\begin{equation}
+  D\vect{1}=\vect{0}.
+\end{equation}
+这表示 $D$ 每一行元素之和为零：
+\begin{equation}
+  \sum_{j=0}^N D_{ij}=0.
+\end{equation}
+因此
+\begin{equation}
+  \boxed{D_{ii}=-\sum_{\substack{j=0\\j\ne i}}^N D_{ij}}.
+  \label{eq:D-diagonal}
+\end{equation}
+负行和并不是经验技巧，而是精确保持 $\mathrm d(1)/\mathrm dx=0$ 的代数条件。
+
+\subsection{最小例子：$N=2$}
+
+三个节点为
+\begin{equation}
+  x_0=1,\qquad x_1=0,\qquad x_2=-1,
+\end{equation}
+微分矩阵为
+\begin{equation}
+  D=\begin{bmatrix}
+  \frac32&-2&\frac12\\[3pt]
+  \frac12&0&-\frac12\\[3pt]
+  -\frac12&2&-\frac32
+  \end{bmatrix}.
+\end{equation}
+它满足
+\begin{equation}
+  D\begin{bmatrix}1\\1\\1\end{bmatrix}
+  =\begin{bmatrix}0\\0\\0\end{bmatrix},
+\end{equation}
+并且对 $u(x)=x^2$，
+\begin{equation}
+  D\begin{bmatrix}1\\0\\1\end{bmatrix}
+  =\begin{bmatrix}2\\0\\-2\end{bmatrix},
+\end{equation}
+恰好等于 $u'(x)=2x$ 在节点 $1,0,-1$ 上的值。一般地，$D$ 对次数不超过 $N$ 的多项式的一阶导数是精确的（忽略浮点舍入误差）。
+
+\section{MATLAB 实现及逐行解释}
+
+\begin{lstlisting}[caption={Chebyshev 一阶微分矩阵}]
+function [D, x] = cheb(N)
+% CHEB 构造 CGL 节点和一阶谱微分矩阵。
+% 若 u(j+1)=u(x_j)，则 D*u 是插值多项式在节点处的导数。
+
+    if N == 0
+        D = 0;
+        x = 1;
+        return
+    end
+
+    % x_0=1, x_N=-1，共 N+1 个节点
+    x = cos(pi*(0:N)'/N);
+
+    % 代码变量 c 实际存储 c_j*(-1)^j
+    c = [2; ones(N-1,1); 2] .* (-1).^(0:N)';
+
+    % dX(i,j)=x_i-x_j（数学下标比 MATLAB 下标小 1）
+    X  = repmat(x,1,N+1);
+    dX = X-X';
+
+    % 构造非对角元素；eye 暂时防止对角位置除以零
+    D = (c*(1./c)') ./ (dX+eye(N+1));
+
+    % 以负行和替换临时对角元
+    D = D-diag(sum(D,2));
+end
+\end{lstlisting}
+
+代码中的变量 \texttt{c} 已把数学上的 $c_j$ 与 $(-1)^j$ 合并。若记
+\begin{equation}
+  \widetilde c_j=c_j(-1)^j,
+\end{equation}
+则外积 \texttt{c*(1./c)'} 的第 $(i,j)$ 个元素为
+\begin{equation}
+  \frac{\widetilde c_i}{\widetilde c_j}
+  =\frac{c_i}{c_j}(-1)^{i-j}
+  =\frac{c_i}{c_j}(-1)^{i+j}.
+\end{equation}
+再逐元素除以 \texttt{dX}，正好得到式~\eqref{eq:D-offdiag}。
+
+在 \texttt{dX+eye(N+1)} 中加入单位矩阵，只是把对角分母临时从 $0$ 改为 $1$；下一行会重新计算全部对角元。若临时矩阵记为 $\widetilde D$，则
+\begin{equation}
+  D_{ii}=\widetilde D_{ii}-\sum_{j=0}^N\widetilde D_{ij}
+  =-\sum_{j\ne i}\widetilde D_{ij},
+\end{equation}
+所以无论临时对角元是多少，最终都会被负行和替换。
+
+\section{高阶导数矩阵}
+
+由
+\begin{equation}
+  \vect{u}'\approx D\vect{u}
+\end{equation}
+再作用一次 $D$：
+\begin{equation}
+  \vect{u}''\approx D\vect{u}'\approx D(D\vect{u})=D^2\vect{u}.
+\end{equation}
+因此二阶微分矩阵写作
+\begin{equation}
+  \boxed{D_2=D^2}.
+\end{equation}
+MATLAB 中应使用矩阵乘法 \texttt{D*D} 或 \texttt{D\string^2}，不能使用 \texttt{D.\string^2}；后者只是把每个元素分别平方。
+
+\section{经典例子：一维 Poisson 边值问题}
+
+考虑
+\begin{equation}
+  u''(x)=e^{4x},\qquad -1<x<1,
+  \label{eq:poisson}
+\end{equation}
+以及齐次 Dirichlet 边界条件
+\begin{equation}
+  u(-1)=u(1)=0.
+\end{equation}
+两次积分可得通解
+\begin{equation}
+  u(x)=\frac{e^{4x}}{16}+C_1x+C_2.
+\end{equation}
+代入两个边界条件求得
+\begin{equation}
+  C_1=-\frac{\sinh4}{16},
+  \qquad C_2=-\frac{\cosh4}{16},
+\end{equation}
+故解析解为
+\begin{equation}
+  \boxed{u(x)=\frac{e^{4x}-x\sinh4-\cosh4}{16}}.
+\end{equation}
+
+\subsection{离散方程与边界条件}
+
+在全部节点上，式~\eqref{eq:poisson} 离散为
+\begin{equation}
+  D^2\vect{u}\approx\vect{f}.
+\end{equation}
+记内部未知量为
+\begin{equation}
+  \vect{u}_{\mathrm{in}}=
+  \begin{bmatrix}u_1&\cdots&u_{N-1}\end{bmatrix}^{\mathsf T}.
+\end{equation}
+内部行可以写成
+\begin{equation}
+  D^2_{\mathrm{in},\mathrm{in}}\vect{u}_{\mathrm{in}}
+  +D^2_{\mathrm{in},0}u_0
+  +D^2_{\mathrm{in},N}u_N
+  =\vect{f}_{\mathrm{in}}.
+\end{equation}
+本例中 $u_0=u(1)=0$、$u_N=u(-1)=0$，所以边界列对应的项消失，只需解
+\begin{equation}
+  D^2_{\mathrm{in},\mathrm{in}}\vect{u}_{\mathrm{in}}
+  =\vect{f}_{\mathrm{in}}.
+\end{equation}
+
+\begin{lstlisting}[caption={Poisson 边值问题求解程序}]
+clear; clc; close all;
+
+N = 16;
+[D,x] = cheb(N);
+D2 = D^2;
+
+% MATLAB 的 2:N 对应数学下标 1,...,N-1
+A = D2(2:N,2:N);
+f = exp(4*x(2:N));
+
+u_inner = A\f;
+u = [0;u_inner;0];
+
+u_exact = (exp(4*x)-x*sinh(4)-cosh(4))/16;
+err_inf = norm(u-u_exact,inf);
+fprintf('N=%d, 最大节点误差=%.3e\n',N,err_inf);
+
+% x 原本从 1 排到 -1；绘图前升序排列
+[x_plot,idx] = sort(x);
+plot(x_plot,u_exact(idx),'k-','LineWidth',1.5); hold on;
+plot(x_plot,u(idx),'ro','MarkerSize',6);
+grid on;
+xlabel('x'); ylabel('u(x)');
+legend('解析解','谱方法节点解','Location','best');
+\end{lstlisting}
+
+\subsection{非齐次边界条件}
+
+若
+\begin{equation}
+  u(1)=\alpha,\qquad u(-1)=\beta,
+\end{equation}
+由于节点顺序为 $x_0=1$、$x_N=-1$，内部右端项必须改为
+\begin{equation}
+  \vect{f}_{\mathrm{in}}
+  -D^2_{\mathrm{in},0}\alpha
+  -D^2_{\mathrm{in},N}\beta.
+\end{equation}
+对应代码为
+\begin{lstlisting}
+rhs = f - D2(2:N,1)*alpha - D2(2:N,N+1)*beta;
+u_inner = D2(2:N,2:N)\rhs;
+u = [alpha;u_inner;beta];
+\end{lstlisting}
+非齐次边界下不能只删掉首尾两列而不修改右端项。
+
+\section{验证微分矩阵}
+
+在求解微分方程前，先验证 $D$ 的基本性质。对于次数不超过 $N$ 的多项式，$D$ 应在浮点舍入范围内给出精确导数。
+
+\begin{lstlisting}[caption={微分矩阵自检}]
+clear; clc;
+N = 8;
+[D,x] = cheb(N);
+
+err_const = norm(D*ones(size(x)),inf);
+err_x     = norm(D*x-ones(size(x)),inf);
+err_x2    = norm(D*(x.^2)-2*x,inf);
+err_xN    = norm(D*(x.^N)-N*x.^(N-1),inf);
+
+fprintf('常函数误差 = %.3e\n',err_const);
+fprintf('x 导数误差 = %.3e\n',err_x);
+fprintf('x^2 导数误差 = %.3e\n',err_x2);
+fprintf('x^N 导数误差 = %.3e\n',err_xN);
+\end{lstlisting}
+
+还可检查
+\begin{equation}
+  \lVert D\vect{1}\rVert_\infty
+\end{equation}
+是否接近机器精度。若它明显不小，通常意味着差矩阵方向、权重比值或对角元处理有误。
+
+\section{谱收敛实验}
+
+对光滑或解析函数，Chebyshev 谱方法的误差通常随 $N$ 快速下降，常表现为指数型或几何型收敛，直到舍入误差和矩阵条件数开始主导。
+
+\begin{lstlisting}[caption={误差随 $N$ 的变化}]
+Nvec = 2:2:40;
+err = zeros(size(Nvec));
+
+for k = 1:numel(Nvec)
+    N = Nvec(k);
+    [D,x] = cheb(N);
+    D2 = D^2;
+    f = exp(4*x(2:N));
+    u = [0;D2(2:N,2:N)\f;0];
+    ue = (exp(4*x)-x*sinh(4)-cosh(4))/16;
+    err(k) = norm(u-ue,inf);
+end
+
+semilogy(Nvec,err,'o-');
+grid on;
+xlabel('N'); ylabel('最大节点误差');
+title('Chebyshev 谱配置法的收敛');
+\end{lstlisting}
+
+半对数坐标上若误差在一段区间内近似直线下降，说明误差大致满足 $C\rho^{-N}$，其中 $\rho>1$。误差触及约 $10^{-14}$ 附近后不再下降，并不表示理论失效，而通常是双精度舍入误差已经成为主要误差源。
+
+\section{常见混淆与排错}
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.27\textwidth}p{0.65\textwidth}}
+\toprule
+混淆 & 正确理解\\
+\midrule
+\endhead
+$\ell_j(x_i)=\delta_{ij}$ 是否说明 $\ell_j$ 恒为零？
+& 不说明。它只规定有限个节点上的取值；在自己的节点处为 $1$，节点之间一般非零。\\
+
+$D$ 是原函数的精确导数算子吗？
+& $D$ 精确求的是插值多项式 $p_N$ 在节点上的导数。它对原函数导数的准确程度取决于插值误差和函数光滑性。\\
+
+$c_0=c_N=2$ 是经验修正吗？
+& 不是。它来自 $q'(\pm1)$ 的绝对值为 $2N$，而内部 $q'(x_j)$ 的绝对值为 $N$。\\
+
+为什么代码里的 \texttt{c} 有正负号？
+& 代码把数学上的端点系数 $c_j$ 和交替因子 $(-1)^j$ 合并为一个向量。\\
+
+为什么 $D$ 是稠密的？
+& 因为每个 Lagrange 基函数是全局多项式，一个节点值会影响整条插值曲线。\\
+
+为什么 $D^2$ 不是逐元素平方？
+& 连续求导对应线性算子的复合，因此是矩阵乘法 $D D$。\\
+
+为什么结果符号全部相反？
+& 最常见原因是把 $x_i-x_j$ 写成了 $x_j-x_i$，或节点顺序与公式约定不一致。用 $D\vect{x}=\vect{1}$ 检查。\\
+
+为什么非齐次边界结果不对？
+& 删除边界列前，必须把这些列乘已知边界值后移到右端。\\
+\bottomrule
+\end{longtable}
+
+\section{符号表}
+
+\begin{longtable}{>{\centering\arraybackslash}p{0.18\textwidth}p{0.72\textwidth}}
+\toprule
+符号 & 含义\\
+\midrule
+\endhead
+$N$ & 插值多项式最高次数；节点总数为 $N+1$。\\
+$i,j,k,m$ & 节点或连乘、求和指标，数学下标从 $0$ 开始。\\
+$x_j$ & 第 $j$ 个节点；CGL 节点为 $\cos(j\pi/N)$。\\
+$u_j$ & $u(x_j)$，原函数在第 $j$ 个节点上的值。\\
+$p_N(x)$ & 穿过全部节点值的次数不超过 $N$ 的插值多项式。\\
+$\ell_j(x)$ & 第 $j$ 个 Lagrange 基函数。\\
+$\delta_{ij}$ & Kronecker 符号；$i=j$ 时为 $1$，否则为 $0$。\\
+$\omega(x)$ & 节点多项式 $\prod_{k=0}^N(x-x_k)$。\\
+$D_{ij}$ & $\ell_j'(x_i)$，一阶微分矩阵第 $i$ 行第 $j$ 列。\\
+$U_n(x)$ & 第二类 Chebyshev 多项式。\\
+$c_j$ & 端点修正系数；端点为 $2$，内部为 $1$。\\
+$D^2$ & 一阶微分矩阵的矩阵平方，用于二阶导数。\\
+$\lVert\cdot\rVert_\infty$ & 向量分量绝对值的最大值。\\
+\bottomrule
+\end{longtable}
+
+\section{建议练习}
+
+\begin{enumerate}[label=\arabic*.]
+  \item 手算 $N=2$ 时全部 $D_{ij}$，并验证 $D\vect{1}=0$、$D\vect{x}=\vect{1}$。
+  \item 用程序验证 $D(x^m)=m x^{m-1}$，其中 $m=0,1,\ldots,N$。
+  \item 把方程改为 $-u''+u=f$，写出离散矩阵 $-D^2+I$。
+  \item 取非齐次边界 $u(1)=1$、$u(-1)=2$，验证右端修正项。
+  \item 比较 Chebyshev 谱方法与二阶中心差分的误差随节点数变化。
+  \item 解释当函数不光滑时，为什么谱收敛速度会显著下降。
+\end{enumerate}
+
+\section{核心结论}
+
+整套方法最重要的三条公式是
+\begin{equation}
+  \boxed{D_{ij}=\ell_j'(x_i)},
+\end{equation}
+它定义了微分矩阵的本质；
+\begin{equation}
+  \boxed{
+  D_{ij}=\frac{c_i}{c_j}
+  \frac{(-1)^{i+j}}{x_i-x_j},\quad i\ne j},
+\end{equation}
+它给出了 CGL 节点上的非对角元素；以及
+\begin{equation}
+  \boxed{D_{ii}=-\sum_{j\ne i}D_{ij}},
+\end{equation}
+它由常函数导数为零确定对角元素。
+
+从思想上说，谱配置法完成了如下转换：
+\begin{equation*}
+\boxed{\text{微积分中的求导}\quad\longrightarrow\quad\text{线性代数中的矩阵乘法}}.
+\end{equation*}
+
+\end{document}

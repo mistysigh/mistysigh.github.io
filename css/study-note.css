@@ -1,0 +1,168 @@
+.study-section-card {
+  margin: 0 1rem 1rem;
+  padding: 1.5rem 2rem;
+  background: var(--post-block-bg-color);
+}
+
+.study-section-card .post-title,
+.study-note .post-title {
+  text-align: left;
+}
+
+.study-section-card p,
+.study-note-list p {
+  line-height: 1.8;
+}
+
+.study-section-card ul,
+.study-note-list ul {
+  padding-left: 1.4rem;
+}
+
+.study-section-card li,
+.study-note-list li {
+  margin: 0.8rem 0;
+}
+
+.study-section-card a,
+.study-note-list a,
+.study-back a {
+  color: #0078e7;
+}
+
+.study-note-list {
+  padding: 1rem 2rem 2rem;
+}
+
+.study-note-list .note-entry {
+  border-top: 1px solid rgba(127, 127, 127, 0.18);
+  padding-top: 1rem;
+}
+
+.study-note-list .note-entry h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.3rem;
+}
+
+.study-note .post-header {
+  padding-bottom: 0.5rem;
+}
+
+.study-note .post-content {
+  line-height: 1.85;
+}
+
+.study-subtitle,
+.study-lead,
+.study-route {
+  color: var(--hty-secondary-text-color);
+}
+
+.study-lead {
+  font-size: 1.05rem;
+}
+
+.study-route {
+  background: rgba(0, 120, 231, 0.06);
+  border-left: 3px solid #0078e7;
+  padding: 0.8rem 1rem;
+}
+
+.study-toc {
+  border: 1px solid rgba(0, 120, 231, 0.25);
+  border-radius: 0.4rem;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.study-toc h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+}
+
+.study-toc ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 0.35rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.study-toc li {
+  margin: 0;
+}
+
+.study-toc a {
+  display: block;
+  text-decoration: none;
+  line-height: 1.6;
+}
+
+.study-toc a span {
+  margin-right: 0.6rem;
+  color: var(--hty-secondary-text-color);
+  font-size: 0.8rem;
+}
+
+.study-note .math.display,
+.study-note mjx-container[display],
+.study-note .markdown-body pre,
+.study-note .markdown-body table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.study-note .markdown-body pre {
+  padding: 1rem;
+  background: #f7f8fa;
+  border: 1px solid rgba(127, 127, 127, 0.18);
+}
+
+.dark .study-note .markdown-body pre {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.study-note .markdown-body pre[data-caption]::before {
+  content: attr(data-caption);
+  display: block;
+  margin-bottom: 0.75rem;
+  color: var(--hty-secondary-text-color);
+  font-size: 0.9rem;
+}
+
+.study-note .markdown-body table {
+  display: block;
+  width: max-content;
+  border-collapse: collapse;
+}
+
+.study-note .markdown-body td,
+.study-note .markdown-body th {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(127, 127, 127, 0.2);
+}
+
+.study-note .markdown-body h1,
+.study-note .markdown-body h2 {
+  scroll-margin-top: 1rem;
+}
+
+.study-back {
+  padding: 0 2rem 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .study-section-card {
+    margin: 0 0 1rem;
+    padding: 1rem;
+  }
+
+  .study-note-list {
+    padding: 1rem;
+  }
+
+  .study-toc {
+    padding: 1rem;
+  }
+}
