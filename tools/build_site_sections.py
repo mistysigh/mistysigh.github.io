@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MAIN_OPEN = '<main class="sidebar-translate" id="content">'
 STYLESHEET = '<link rel="stylesheet" href="/css/study-note.css">'
 NOTE_URL = '/notes/chebyshev-spectral-collocation/'
+DIRECT_SOLVERS_URL = '/notes/numerical-analysis-direct-solvers/'
 LIFE_URL = '/2025/02/16/%E4%B9%99%E5%B7%B3%E8%9B%87%E5%B9%B4%E6%98%A5%E8%8A%82/'
 
 
@@ -56,9 +57,16 @@ def refresh_sidebar(page: str) -> str:
                             f'href="{new_url}" title="{title}" aria-label="{title}"',
                             anchor, count=1)
             anchor = anchor.replace(f'data-icon="{old_icon}"', f'data-icon="{new_icon}"', 1)
-            anchor = anchor.replace('<span class="site-state-item-count">0</span>',
-                                    '<span class="site-state-item-count">1</span>', 1)
+            count = '2' if old == 'categories' else '1'
+            anchor = re.sub(r'<span class="site-state-item-count">\d+</span>',
+                            f'<span class="site-state-item-count">{count}</span>',
+                            anchor, count=1)
             page = page[:match.start()] + anchor + page[match.end():]
+    page = re.sub(
+        r'(<a href="/notes/" title="学习笔记"[^>]*>.*?'
+        r'<span class="site-state-item-count">)\d+(</span></a>)',
+        r'\g<1>2\2', page, count=1, flags=re.DOTALL,
+    )
     return page
 
 
@@ -67,6 +75,10 @@ def main() -> None:
         '<article class="note-entry"><h2><a href="' + NOTE_URL + '">从零理解 Chebyshev 谱配置法</a></h2>'
         '<p>Lagrange 插值、谱微分矩阵、一维 Poisson 边值问题与 MATLAB 验证。</p>'
         '<p>按照“节点值 → 插值 → 求导 → 离散求解”的路线阅读；文内有目录、公式、代码和练习。</p>'
+        '</article>'
+        '<article class="note-entry"><h2><a href="' + DIRECT_SOLVERS_URL + '">从消元代码读懂线性方程组的直接解法</a></h2>'
+        '<p>《数值分析基础》第二章：Gauss 消去、选主元、LU、Cholesky、追赶法、五点差分与条件数。</p>'
+        '<p>以 MATLAB 代码串联公式、数组索引、可复算例题和误差诊断。</p>'
         '</article>'
     )
     life_item = (
@@ -95,7 +107,9 @@ def main() -> None:
         '<span class="icon iconify" data-icon="ri:book-open-line"></span>学习笔记</h1></header>'
         '<p>从公式的来处读起，走到可复算的数值实验。</p>'
         f'<ul><li><a href="{NOTE_URL}">从零理解 Chebyshev 谱配置法</a>：'
-        'Lagrange 插值、微分矩阵与一维 Poisson 问题</li></ul>'
+        'Lagrange 插值、微分矩阵与一维 Poisson 问题</li>'
+        f'<li><a href="{DIRECT_SOLVERS_URL}">从消元代码读懂线性方程组的直接解法</a>：'
+        '选主元、三角分解、稀疏系统与误差诊断</li></ul>'
         '<p><a href="/notes/">查看学习笔记栏目 →</a></p></section>'
         '<section class="hty-card study-section-card" aria-labelledby="home-life">'
         '<header class="post-header"><h2 class="post-title" id="home-life">'
@@ -113,7 +127,7 @@ def main() -> None:
     page = replace_main(page, (
         f'{MAIN_OPEN}<div class="hty-card" id="page"><header class="post-header">'
         '<h1 class="post-title">栏目</h1></header><div class="study-note-list">'
-        '<p><a href="/notes/">学习笔记</a> · 1 篇</p>'
+        '<p><a href="/notes/">学习笔记</a> · 2 篇</p>'
         '<p><a href="/life/">生活记录</a> · 1 篇</p>'
         '</div></div></main>'
     ))
