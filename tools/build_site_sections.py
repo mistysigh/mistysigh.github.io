@@ -12,6 +12,7 @@ MAIN_OPEN = '<main class="sidebar-translate" id="content">'
 STYLESHEET = '<link rel="stylesheet" href="/css/study-note.css">'
 NOTE_URL = '/notes/chebyshev-spectral-collocation/'
 DIRECT_SOLVERS_URL = '/notes/numerical-analysis-direct-solvers/'
+LEVEQUE_URL = '/notes/leveque-finite-difference/'
 LIFE_URL = '/2025/02/16/%E4%B9%99%E5%B7%B3%E8%9B%87%E5%B9%B4%E6%98%A5%E8%8A%82/'
 
 
@@ -57,7 +58,7 @@ def refresh_sidebar(page: str) -> str:
                             f'href="{new_url}" title="{title}" aria-label="{title}"',
                             anchor, count=1)
             anchor = anchor.replace(f'data-icon="{old_icon}"', f'data-icon="{new_icon}"', 1)
-            count = '2' if old == 'categories' else '1'
+            count = '3' if old == 'categories' else '1'
             anchor = re.sub(r'<span class="site-state-item-count">\d+</span>',
                             f'<span class="site-state-item-count">{count}</span>',
                             anchor, count=1)
@@ -65,7 +66,7 @@ def refresh_sidebar(page: str) -> str:
     page = re.sub(
         r'(<a href="/notes/" title="学习笔记"[^>]*>.*?'
         r'<span class="site-state-item-count">)\d+(</span></a>)',
-        r'\g<1>2\2', page, count=1, flags=re.DOTALL,
+        r'\g<1>3\2', page, count=1, flags=re.DOTALL,
     )
     return page
 
@@ -79,6 +80,10 @@ def main() -> None:
         '<article class="note-entry"><h2><a href="' + DIRECT_SOLVERS_URL + '">从消元代码读懂线性方程组的直接解法</a></h2>'
         '<p>《数值分析基础》第二章：Gauss 消去、选主元、LU、Cholesky、追赶法、五点差分与条件数。</p>'
         '<p>以 MATLAB 代码串联公式、数组索引、可复算例题和误差诊断。</p>'
+        '</article>'
+        '<article class="note-entry"><h2><a href="' + LEVEQUE_URL + '">LeVeque 有限差分方法：前三章导读</a></h2>'
+        '<p>从差分权重走向一维边值问题与二维椭圆方程，分三章推导截断误差、稳定性与收敛。</p>'
+        '<p>以理论为主，补充边界层、高阶格式及稀疏线性代数的关键判断。</p>'
         '</article>'
     )
     life_item = (
@@ -109,7 +114,9 @@ def main() -> None:
         f'<ul><li><a href="{NOTE_URL}">从零理解 Chebyshev 谱配置法</a>：'
         'Lagrange 插值、微分矩阵与一维 Poisson 问题</li>'
         f'<li><a href="{DIRECT_SOLVERS_URL}">从消元代码读懂线性方程组的直接解法</a>：'
-        '选主元、三角分解、稀疏系统与误差诊断</li></ul>'
+        '选主元、三角分解、稀疏系统与误差诊断</li>'
+        f'<li><a href="{LEVEQUE_URL}">LeVeque 有限差分方法：前三章导读</a>：'
+        '差分近似、一维边值问题和二维椭圆方程</li></ul>'
         '<p><a href="/notes/">查看学习笔记栏目 →</a></p></section>'
         '<section class="hty-card study-section-card" aria-labelledby="home-life">'
         '<header class="post-header"><h2 class="post-title" id="home-life">'
@@ -127,7 +134,7 @@ def main() -> None:
     page = replace_main(page, (
         f'{MAIN_OPEN}<div class="hty-card" id="page"><header class="post-header">'
         '<h1 class="post-title">栏目</h1></header><div class="study-note-list">'
-        '<p><a href="/notes/">学习笔记</a> · 2 篇</p>'
+        '<p><a href="/notes/">学习笔记</a> · 3 篇</p>'
         '<p><a href="/life/">生活记录</a> · 1 篇</p>'
         '</div></div></main>'
     ))

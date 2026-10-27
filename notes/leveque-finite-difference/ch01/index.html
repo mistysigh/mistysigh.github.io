@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="theme-color" content="#0078E7"><meta name="author" content="Misty Sigh"><meta name="copyright" content="Misty Sigh"><meta name="generator" content="Hexo 7.3.0"><meta name="theme" content="hexo-theme-yun"><title>第一章：有限差分近似 | cloudintosea's blog</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@900&amp;display=swap" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/star-markdown-css@0.4.1/dist/yun/yun-markdown.min.css"><link rel="stylesheet" href="https://fastly.jsdelivr.net/npm/prism-theme-vars/base.css"><script src="https://fastly.jsdelivr.net/npm/scrollreveal/dist/scrollreveal.min.js" defer></script><script>function initScrollReveal() {
+  [".post-card",".markdown-body img"].forEach((target)=> {
+    ScrollReveal().reveal(target);
+  })
+}
+document.addEventListener("DOMContentLoaded", initScrollReveal);
+document.addEventListener("pjax:success", initScrollReveal);
+</script><link rel="icon" type="image/png" href="/yun.png"><link rel="mask-icon" href="/yun.svg" color="#0078E7"><link rel="preload" href="/css/hexo-theme-yun.css" as="style"><link rel="prefetch" href="/js/sidebar.js" as="script"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://fastly.jsdelivr.net/npm/" crossorigin><script id="yun-config">
+    window.Yun = {}
+    window.CONFIG = {"hostname":"mistysigh.github.io","root":"/","title":"心与行并，渐行渐远，且慢且慢","version":"1.10.11","mode":"auto","copycode":true,"page":{"isPost":false},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}.","hits":"${hits} results found","hits_time":"${hits} results found in ${time} ms"},"anonymous_image":"https://cdn.yunyoujun.cn/img/avatar/none.jpg","say":{"api":"https://el-bot-api.vercel.app/api/words/young"},"fireworks":{"colors":null},"vendors":{"host":"https://fastly.jsdelivr.net/npm/","darken":"https://fastly.jsdelivr.net/npm/darken@1.5.0"}};
+  </script><link rel="stylesheet" href="/css/hexo-theme-yun.css"><script src="/js/hexo-theme-yun.js" type="module"></script><meta property="og:type" content="article">
+<meta property="og:title" content="第一章：有限差分近似">
+<meta property="og:url" content="https://mistysigh.github.io/notes/leveque-finite-difference/ch01/">
+<meta property="og:site_name" content="cloudintosea&#39;s blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Misty Sigh">
+<meta name="twitter:card" content="summary"><script>(function() {
+  if (CONFIG.mode !== 'auto') return
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  const setting = localStorage.getItem('darken-mode') || 'auto'
+  if (setting === 'dark' || (prefersDark && setting !== 'light'))
+    document.documentElement.classList.toggle('dark', true)
+})()</script><link rel="stylesheet" href="/css/study-note.css"><script>window.MathJax={tex:{inlineMath:[["\(","\)"]],displayMath:[["\[","\]"]],packages:{"[+]":["ams"]}},options:{enableMenu:false}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script></head><body><script src="https://code.iconify.design/2/2.1.1/iconify.min.js"></script><script>// Define global variable
+IconifyProviders = {
+  // Empty prefix: overwrite default API provider configuration
+  '': {
+    // Use custom API first, use Iconify public API as backup
+    resources: [
+        'https://api.iconify.design',
+    ],
+    // Wait for 1 second before switching API hosts
+    rotate: 1000,
+  },
+};</script><script defer src="https://fastly.jsdelivr.net/npm/animejs@latest"></script><script defer src="/js/ui/fireworks.js" type="module"></script><canvas class="fireworks"></canvas><div class="container"><a class="sidebar-toggle hty-icon-button" id="menu-btn"><div class="hamburger hamburger--spin" type="button"><span class="hamburger-box"><span class="hamburger-inner"></span></span></div></a><div class="sidebar-toggle sidebar-overlay"></div><aside class="sidebar"><script src="/js/sidebar.js" type="module"></script><div class="sidebar-panel sidebar-panel-active" id="site-overview-wrap"><div class="site-info"><a class="site-author-avatar" href="/about/" title="Misty Sigh"><img width="96" loading="lazy" src="/images/myself.png" alt="Misty Sigh"><span class="site-author-status" title="观雨识海">☺️</span></a><div class="site-author-name"><a href="/about/">Misty Sigh</a></div><span class="site-name">cloudintosea's blog</span><sub class="site-subtitle"></sub><div class="site-description"></div></div><nav class="site-state"><a class="site-state-item hty-icon-button icon-home" href="/" title="Home"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:home-4-line"></span></span></a><div class="site-state-item"><a href="/archives/" title="Archives"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:archive-line"></span></span><span class="site-state-item-count">2</span></a></div><div class="site-state-item"><a href="/notes/" title="学习笔记" aria-label="学习笔记"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:book-open-line"></span></span><span class="site-state-item-count">3</span></a></div><div class="site-state-item"><a href="/life/" title="生活记录" aria-label="生活记录"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:camera-line"></span></span><span class="site-state-item-count">1</span></a></div><a class="site-state-item hty-icon-button" target="_blank" rel="noopener" href="https://yun.yunyoujun.cn" title="文档"><span class="site-state-item-icon"><span class="icon iconify" data-icon="ri:settings-line"></span></span></a></nav><hr style="margin-bottom:0.5rem"><hr style="margin:0.5rem 1rem"><div class="links"><a class="links-item hty-icon-button" href="/links/" title="我的小伙伴们" style="color:dodgerblue"><span class="icon iconify" data-icon="ri:genderless-line"></span></a></div><br><a class="links-item hty-icon-button" id="toggle-mode-btn" href="javascript:;" title="Mode" style="color: #f1cb64"><span class="icon iconify" data-icon="ri:contrast-2-line"></span></a></div></aside><main class="sidebar-translate" id="content"><div id="post"><article class="hty-card post-block study-note" itemscope itemtype="https://schema.org/Article"><link itemprop="mainEntityOfPage" href="https://mistysigh.github.io/notes/leveque-finite-difference/ch01/"><header class="post-header"><h1 class="post-title" itemprop="name headline">第一章：有限差分近似</h1><p class="study-subtitle">Taylor 展开、差分权重与局部精度</p><div class="post-meta"><a href="/notes/">学习笔记</a> · <a href="/notes/leveque-finite-difference/">LeVeque 有限差分方法</a></div></header><section class="post-body" itemprop="articleBody"><div class="post-content markdown-body"><nav class="study-toc" aria-label="本文目录"><h2>本文目录</h2><ol><li><a href="#为什么有限差分要先研究已知函数"><span>01</span>1.1 为什么有限差分要先研究“已知函数”</a></li><li><a href="#前向后向与中心差分为什么中心差分高一阶"><span>02</span>1.2 前向、后向与中心差分：为什么中心差分高一阶</a></li><li><a href="#用待定系数法自己造一个边界公式"><span>03</span>1.3 用待定系数法自己造一个边界公式</a></li><li><a href="#二阶与更高阶导数"><span>04</span>1.4 二阶与更高阶导数</a></li><li><a href="#任意节点上的差分权重从哪里来"><span>05</span>1.5 任意节点上的差分权重从哪里来</a></li><li><a href="#第一章小结与继续阅读"><span>06</span>第一章小结与继续阅读</a></li></ol></nav>
+<p><strong>阅读定位。</strong>本章依据 R. J. LeVeque, <em>Finite Difference Methods for Ordinary and Partial Differential Equations</em>（SIAM, 2007）第一章及用户提供的中文 TeX 稿整理。这里重写推导与解释，沿用原书的节次；公式由笔记自行推得。下一章才把这些差分公式放进边值问题，求未知函数的离散值。</p>
+<h2 id="为什么有限差分要先研究已知函数">1.1 为什么有限差分要先研究“已知函数”</h2>
+<p>有限差分法最后要解的是微分方程，但第一步先假设光滑函数 <span class="math inline">\(u(x)\)</span> <strong>已知</strong>，考察只看邻近点的函数值能多准确地求 <span class="math inline">\(u&#39;(x)\)</span>、<span class="math inline">\(u&#39;&#39;(x)\)</span>。这样可以把“导数近似的误差”与“求解整个方程带来的误差”分开。前者是本章的主题；两者之间还差一个稳定性论证，第二章将补上。</p>
+<p>固定待求导点 <span class="math inline">\(\bar x\)</span>，网格宽度 <span class="math inline">\(h&gt;0\)</span>。<span class="math inline">\(u(\bar x+h)\)</span> 和 <span class="math inline">\(u(\bar x-h)\)</span> 是两个实数；差分公式输出的也是一个数，不是新的函数。<span class="math inline">\(h\to0\)</span> 时若误差满足 <span class="math inline">\(|D_hu(\bar x)-u&#39;(\bar x)|\le Ch^p\)</span>，其中 <span class="math inline">\(C\)</span> 与 <span class="math inline">\(h\)</span> 无关，就称在该点具有至少 <span class="math inline">\(p\)</span> 阶精度。这个说法需要足够的光滑性，并假设 <span class="math inline">\(h\)</span> 已进入渐近区间。</p>
+<h2 id="前向后向与中心差分为什么中心差分高一阶">1.2 前向、后向与中心差分：为什么中心差分高一阶</h2>
+<p>前向与后向割线的斜率分别是</p>
+<p><span class="math display">\[
+D_+u(\bar x)=\frac{u(\bar x+h)-u(\bar x)}{h},\qquad
+D_-u(\bar x)=\frac{u(\bar x)-u(\bar x-h)}{h}.
+\]</span></p>
+<p>围绕同一中心点作 Taylor 展开，暂把各阶导数都理解为在 <span class="math inline">\(\bar x\)</span> 处取值：</p>
+<p><span class="math display">\[
+u(\bar x\pm h)=u\pm hu&#39;+\frac{h^2}{2}u&#39;&#39;\pm\frac{h^3}{6}u&#39;&#39;&#39;
++\frac{h^4}{24}u^{(4)}\pm\frac{h^5}{120}u^{(5)}+\cdots.
+\]</span></p>
+<p>代入并除以 <span class="math inline">\(h\)</span>：</p>
+<p><span class="math display">\[
+D_+u=u&#39;+\frac h2u&#39;&#39;+\frac{h^2}{6}u&#39;&#39;&#39;+O(h^3),\qquad
+D_-u=u&#39;-\frac h2u&#39;&#39;+\frac{h^2}{6}u&#39;&#39;&#39;+O(h^3).
+\]</span></p>
+<p>两个 <span class="math inline">\(O(h)\)</span> 首项符号相反。把它们平均，便得到中心差分</p>
+<p><span class="math display">\[
+D_0u(\bar x)=\frac{u(\bar x+h)-u(\bar x-h)}{2h}
+=u&#39;(\bar x)+\frac{h^2}{6}u&#39;&#39;&#39;(\bar x)+O(h^4).
+\]</span></p>
+<p>因此单侧式一般为一阶，中心式一般为二阶。<strong>“一般”很重要</strong>：若恰好 <span class="math inline">\(u&#39;&#39;(\bar x)=0\)</span>，前向式的首项消失，此点的观察阶可能更高；这不改变公式对任意足够光滑函数的通常精度阶。</p>
+<p>原书还展示一个使用 <span class="math inline">\(\bar x+h,\bar x,\bar x-h,\bar x-2h\)</span> 的三阶一阶导数公式：</p>
+<p><span class="math display">\[
+D_3u(\bar x)=\frac{2u(\bar x+h)+3u(\bar x)-6u(\bar x-h)+u(\bar x-2h)}{6h}
+=u&#39;(\bar x)+\frac{h^3}{12}u^{(4)}(\bar x)+O(h^4).
+\]</span></p>
+<p>各点不对称不等于只能一阶：是否高阶取决于 Taylor 项的<strong>权重矩条件</strong>，不是仅凭图形外观判断。</p>
+<h3 id="从误差图读精度阶">从误差图读精度阶</h3>
+<p>若 <span class="math inline">\(E(h)\approx Ch^p\)</span>，取绝对值再取对数得 <span class="math inline">\(\log|E(h)|\approx\log|C|+p\log h\)</span>。在双对数图中，直线斜率近似 <span class="math inline">\(p\)</span>。原书例 1.1 用 <span class="math inline">\(u(x)=\sin x\)</span>、<span class="math inline">\(\bar x=1\)</span> 对比上述四个公式：分别可看到一阶、一阶、二阶、三阶趋势。实际算到极小 <span class="math inline">\(h\)</span> 时，函数值相减会有浮点消去误差，误差曲线不一定继续下降；观察斜率应选未被舍入误差支配的区间。</p>
+<h2 id="用待定系数法自己造一个边界公式">1.3 用待定系数法自己造一个边界公式</h2>
+<p>边界附近可能没有 <span class="math inline">\(\bar x+h\)</span> 的数据。只使用 <span class="math inline">\(\bar x,\bar x-h,\bar x-2h\)</span>，设</p>
+<p><span class="math display">\[
+Du(\bar x)=a\,u(\bar x)+b\,u(\bar x-h)+c\,u(\bar x-2h).
+\]</span></p>
+<p>把后两项展开，要求常数项系数为零、一阶导数系数为一、二阶导数系数为零：</p>
+<p><span class="math display">\[
+a+b+c=0,\qquad -h(b+2c)=1,\qquad b+4c=0.
+\]</span></p>
+<p>解得 <span class="math inline">\(a=3/(2h)\)</span>、<span class="math inline">\(b=-2/h\)</span>、<span class="math inline">\(c=1/(2h)\)</span>，所以</p>
+<p><span class="math display">\[
+\boxed{Du(\bar x)=\frac{3u(\bar x)-4u(\bar x-h)+u(\bar x-2h)}{2h}}.
+\]</span></p>
+<p>再保留三阶导数项可得 <span class="math inline">\(Du-u&#39;=-(h^2/3)u&#39;&#39;&#39;(\bar x)+O(h^3)\)</span>。用 <span class="math inline">\(u(x)=x^3\)</span> 代入，误差恰为 <span class="math inline">\(-2h^2\)</span>，与 <span class="math inline">\(-(h^2/3)u&#39;&#39;&#39;=-2h^2\)</span> 一致。这也是核对中文 TeX 稿相应译注的一种直接方法。第二章处理 Neumann 边界条件时会再次用到三点单侧导数。</p>
+<p>另一个角度是插值：通过这三个节点构造二次插值多项式 <span class="math inline">\(p(x)\)</span>，取 <span class="math inline">\(p&#39;(\bar x)\)</span>，就得到同一组系数。待定系数法与插值求导是在描述同一个线性泛函。</p>
+<h2 id="二阶与更高阶导数">1.4 二阶与更高阶导数</h2>
+<p>把两侧 Taylor 式相加，奇次幂抵消，得到二阶中心差分</p>
+<p><span class="math display">\[
+\boxed{D^{(2)}_hu(\bar x)=\frac{u(\bar x-h)-2u(\bar x)+u(\bar x+h)}{h^2}
+=u&#39;&#39;(\bar x)+\frac{h^2}{12}u^{(4)}(\bar x)+O(h^4).}
+\]</span></p>
+<p>也可从“斜率的差”理解：<span class="math inline">\(D^{(2)}_h=D_+D_-=D_-D_+\)</span>。分子中的 <span class="math inline">\(1,-2,1\)</span> 并非记忆口诀；它来自右侧斜率 <span class="math inline">\((u_{i+1}-u_i)/h\)</span> 减去左侧斜率 <span class="math inline">\((u_i-u_{i-1})/h\)</span>，再除以 <span class="math inline">\(h\)</span>。</p>
+<p>当相邻间距不等，令 <span class="math inline">\(h_-=x_i-x_{i-1}\)</span>、<span class="math inline">\(h_+=x_{i+1}-x_i\)</span>，先求两侧斜率，再取它们按距离归一化的差：</p>
+<p><span class="math display">\[
+D^{(2)}u(x_i)=\frac{2}{h_-+h_+}
+\left(\frac{u_{i+1}-u_i}{h_+}-\frac{u_i-u_{i-1}}{h_-}\right).
+\]</span></p>
+<p>展开后三个权重依次为 <span class="math inline">\(2/[h_-(h_-+h_+)]\)</span>、<span class="math inline">\(-2/(h_-h_+)\)</span>、<span class="math inline">\(2/[h_+(h_-+h_+)]\)</span>。其误差含有</p>
+<p><span class="math display">\[
+\frac{h_+-h_-}{3}u^{(3)}(x_i)+O(h_-^2+h_+^2).
+\]</span></p>
+<p>随机不等距的三个点通常只给一阶；等距时 <span class="math inline">\(h_+-h_-=0\)</span>，恢复二阶。若节点来自光滑映射 <span class="math inline">\(x_i=X(ih)\)</span>，相邻间距差为 <span class="math inline">\(O(h^2)\)</span>，第二章将说明这种非均匀网格仍可能具有二阶精度。</p>
+<p>高阶导数也可由低阶差分复合。例如 <span class="math inline">\(D_+D^{(2)}_hu\)</span> 用四个节点逼近 <span class="math inline">\(u&#39;&#39;&#39;\)</span>，通常为一阶；采用对称的 <span class="math inline">\(D_0D_+D_-u\)</span> 可把奇次误差抵消，得到二阶。这里的要点是：<strong>求导次数、模板点数、对称性</strong>共同决定阶数。</p>
+<h2 id="任意节点上的差分权重从哪里来">1.5 任意节点上的差分权重从哪里来</h2>
+<p>给定互异节点 <span class="math inline">\(x_1,\ldots,x_n\)</span>，希望用 <span class="math inline">\(\sum_{j=1}^nc_ju(x_j)\)</span> 近似 <span class="math inline">\(u^{(k)}(\bar x)\)</span>。令 <span class="math inline">\(d_j=x_j-\bar x\)</span>。对每个 <span class="math inline">\(u(x_j)\)</span> 作 Taylor 展开，并让该线性组合对 <span class="math inline">\(1,(x-\bar x),\ldots,(x-\bar x)^{n-1}\)</span> 的导数<strong>精确</strong>，便得到 <span class="math inline">\(n\)</span> 个矩条件：</p>
+<p><span class="math display">\[
+\sum_{j=1}^n c_j\frac{d_j^q}{q!}=\begin{cases}1,&amp;q=k,\\0,&amp;q\ne k,\end{cases}
+\qquad q=0,1,\ldots,n-1.
+\]</span></p>
+<p>这是一个 Vandermonde 型线性系统。若 <span class="math inline">\(n\ge k+1\)</span> 且节点互异，权重唯一。前 <span class="math inline">\(n\)</span> 个 Taylor 单项式都被正确处理，所以一般至少有 <span class="math inline">\(O(h^{n-k})\)</span> 的局部误差；因对称性额外抵消时还可能更高。误差常数还取决于节点分布与函数高阶导数，不能只凭 <span class="math inline">\(n-k\)</span> 评价一个公式。</p>
+<p>例如 <span class="math inline">\(k=1\)</span>、<span class="math inline">\(d=(-h,0,h)\)</span> 时，条件依次是“权重和为零”“一阶矩为一”“二阶矩为零”，解为 <span class="math inline">\((-1,0,1)/(2h)\)</span>。<span class="math inline">\(k=2\)</span> 时同样三节点解为 <span class="math inline">\((1,-2,1)/h^2\)</span>。</p>
+<p>原书用解线性系统的 MATLAB 过程说明权重的来源，同时提醒：点数较多时直接解 Vandermonde 系统可能严重病态，实际生成高阶权重宜用更稳健的递推算法。<strong>差分公式的理论阶数与计算权重的浮点稳定性是两个问题。</strong></p>
+<h2 id="第一章小结与继续阅读">第一章小结与继续阅读</h2>
+<p>第一章回答“怎样构造导数近似”和“该近似在真函数上误差多大”。第二章回答更难的问题：把差分式组成方程组并求解后，计算出的整组节点值是否逼近微分方程的解。请带着 <span class="math inline">\(D^{(2)}_h u=u&#39;&#39;+O(h^2)\)</span> 进入<a href="../ch02/">第二章：定常态与边值问题</a>；它会成为局部截断误差的起点。</p>
+</div></section></article><p class="study-back"><a href="/notes/leveque-finite-difference/">← 返回本系列目录</a></p></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2019 – 2025 </span><span class="with-love" id="animate"><span class="icon iconify" data-icon="ri:cloud-line"></span></span><span class="author"> Misty Sigh</span></div><div class="powered"><span>Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> v7.3.0</span><span class="footer-separator">|</span><span>Theme - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.10.11</span></div></footer></div><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><span class="icon iconify" data-icon="ri:arrow-up-s-line"></span><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a><script src="https://fastly.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script><script>const images = [...document.querySelectorAll('.markdown-body img')]
+mediumZoom(images)</script><style>.medium-zoom-image {
+  z-index: 99;
+}</style></body></html>
