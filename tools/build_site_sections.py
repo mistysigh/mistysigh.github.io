@@ -13,6 +13,7 @@ STYLESHEET = '<link rel="stylesheet" href="/css/study-note.css">'
 NOTE_URL = '/notes/chebyshev-spectral-collocation/'
 DIRECT_SOLVERS_URL = '/notes/numerical-analysis-direct-solvers/'
 LEVEQUE_URL = '/notes/leveque-finite-difference/'
+DG_URL = '/notes/dg-guide/'
 LIFE_URL = '/2025/02/16/%E4%B9%99%E5%B7%B3%E8%9B%87%E5%B9%B4%E6%98%A5%E8%8A%82/'
 
 
@@ -58,7 +59,7 @@ def refresh_sidebar(page: str) -> str:
                             f'href="{new_url}" title="{title}" aria-label="{title}"',
                             anchor, count=1)
             anchor = anchor.replace(f'data-icon="{old_icon}"', f'data-icon="{new_icon}"', 1)
-            count = '3' if old == 'categories' else '1'
+            count = '4' if old == 'categories' else '1'
             anchor = re.sub(r'<span class="site-state-item-count">\d+</span>',
                             f'<span class="site-state-item-count">{count}</span>',
                             anchor, count=1)
@@ -66,7 +67,7 @@ def refresh_sidebar(page: str) -> str:
     page = re.sub(
         r'(<a href="/notes/" title="学习笔记"[^>]*>.*?'
         r'<span class="site-state-item-count">)\d+(</span></a>)',
-        r'\g<1>3\2', page, count=1, flags=re.DOTALL,
+        r'\g<1>4\2', page, count=1, flags=re.DOTALL,
     )
     return page
 
@@ -84,6 +85,10 @@ def main() -> None:
         '<article class="note-entry"><h2><a href="' + LEVEQUE_URL + '">LeVeque 有限差分方法：前三章导读</a></h2>'
         '<p>从差分权重走向一维边值问题与二维椭圆方程，分三章推导截断误差、稳定性与收敛。</p>'
         '<p>以理论为主，补充边界层、高阶格式及稀疏线性代数的关键判断。</p>'
+        '</article>'
+        '<article class="note-entry"><h2><a href="' + DG_URL + '">DG 导学：从界面通量到椭圆内罚</a></h2>'
+        '<p>依据 Hesthaven–Warburton 与 Rivière：守恒律、迎风能量、节点矩阵、SIPG 与误差估计。</p>'
+        '<p>四站连贯推导，配界面、参考单元和罚项平衡图。</p>'
         '</article>'
     )
     life_item = (
@@ -116,7 +121,9 @@ def main() -> None:
         f'<li><a href="{DIRECT_SOLVERS_URL}">从消元代码读懂线性方程组的直接解法</a>：'
         '选主元、三角分解、稀疏系统与误差诊断</li>'
         f'<li><a href="{LEVEQUE_URL}">LeVeque 有限差分方法：前三章导读</a>：'
-        '差分近似、一维边值问题和二维椭圆方程</li></ul>'
+        '差分近似、一维边值问题和二维椭圆方程</li>'
+        f'<li><a href="{DG_URL}">DG 导学：从界面通量到椭圆内罚</a>：'
+        '双曲通量、节点实现与椭圆误差理论</li></ul>'
         '<p><a href="/notes/">查看学习笔记栏目 →</a></p></section>'
         '<section class="hty-card study-section-card" aria-labelledby="home-life">'
         '<header class="post-header"><h2 class="post-title" id="home-life">'
@@ -134,7 +141,7 @@ def main() -> None:
     page = replace_main(page, (
         f'{MAIN_OPEN}<div class="hty-card" id="page"><header class="post-header">'
         '<h1 class="post-title">栏目</h1></header><div class="study-note-list">'
-        '<p><a href="/notes/">学习笔记</a> · 3 篇</p>'
+        '<p><a href="/notes/">学习笔记</a> · 4 篇</p>'
         '<p><a href="/life/">生活记录</a> · 1 篇</p>'
         '</div></div></main>'
     ))
