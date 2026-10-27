@@ -59,8 +59,8 @@ def render_page(title: str, subtitle: str, url: str, fragment: str, toc: bool = 
     page = page[:start] + body + page[end:]
     assets = (
         '<link rel="stylesheet" href="/css/study-note.css">'
-        '<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],'
-        'displayMath:[["\\[","\\]"]],packages:{"[+]":["ams"]}},'
+        '<script>window.MathJax={tex:{inlineMath:[["\\\\(","\\\\)"]],'
+        'displayMath:[["\\\\[","\\\\]"]],packages:{"[+]":["ams"]}},'
         'options:{enableMenu:false}};</script>'
         '<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>'
     )
