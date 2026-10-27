@@ -36,6 +36,9 @@ IconifyProviders = {
 <h2 id="为什么有限差分要先研究已知函数">1.1 为什么有限差分要先研究“已知函数”</h2>
 <p>有限差分法最后要解的是微分方程，但第一步先假设光滑函数 <span class="math inline">\(u(x)\)</span> <strong>已知</strong>，考察只看邻近点的函数值能多准确地求 <span class="math inline">\(u&#39;(x)\)</span>、<span class="math inline">\(u&#39;&#39;(x)\)</span>。这样可以把“导数近似的误差”与“求解整个方程带来的误差”分开。前者是本章的主题；两者之间还差一个稳定性论证，第二章将补上。</p>
 <p>固定待求导点 <span class="math inline">\(\bar x\)</span>，网格宽度 <span class="math inline">\(h&gt;0\)</span>。<span class="math inline">\(u(\bar x+h)\)</span> 和 <span class="math inline">\(u(\bar x-h)\)</span> 是两个实数；差分公式输出的也是一个数，不是新的函数。<span class="math inline">\(h\to0\)</span> 时若误差满足 <span class="math inline">\(|D_hu(\bar x)-u&#39;(\bar x)|\le Ch^p\)</span>，其中 <span class="math inline">\(C\)</span> 与 <span class="math inline">\(h\)</span> 无关，就称在该点具有至少 <span class="math inline">\(p\)</span> 阶精度。这个说法需要足够的光滑性，并假设 <span class="math inline">\(h\)</span> 已进入渐近区间。</p>
+<p><strong>精度的量词。</strong>更严格地说，对固定的 <span class="math inline">\(u\)</span> 与 <span class="math inline">\(\bar x\)</span>，若存在 <span class="math inline">\(h_0,C&gt;0\)</span>，使每个 <span class="math inline">\(0&lt;h&lt;h_0\)</span> 都满足上述不等式，才写成 <span class="math inline">\(D_hu(\bar x)-u&#39;(\bar x)=O(h^p)\)</span>。常数 <span class="math inline">\(C\)</span> 可以依赖 <span class="math inline">\(u\)</span> 的高阶导数及所取区间，却不能随着 <span class="math inline">\(h\)</span> 缩小而增长。若只在几个网格宽度上碰巧误差很小，不能据此证明一个格式的阶数。</p>
+<p>从算子角度，<span class="math inline">\(D_h\)</span> 是“给定函数值 <span class="math inline">\(\mapsto\)</span> 近似导数”的线性映射；当输入是真解时，<span class="math inline">\(D_hu-u&#39;\)</span> 是<strong>局部近似误差</strong>。以后把 <span class="math inline">\(D_h\)</span> 装入微分方程，得到一个需反解的矩阵 <span class="math inline">\(A_h\)</span>；那时的全局误差还要乘上离散逆算子的稳定性。这一层次区分将贯穿三章。</p>
+<p>有限个函数值不可能无条件确定任意函数的导数。若模板点为互异的 <span class="math inline">\(x_1,\ldots,x_n\)</span>，则多项式 <span class="math inline">\(p(x)=\prod_j(x-x_j)\)</span> 在所有采样点都为零；把 <span class="math inline">\(u\)</span> 改成 <span class="math inline">\(u+Cp\)</span> 不改变任何采样值，却可能改变 <span class="math inline">\(u&#39;(\bar x)\)</span>。因此差分方法的精度总有函数类假设：例如要求若干阶导数在附近存在且有界；随着 <span class="math inline">\(h\)</span> 缩小，采样点才共同逼近目标点。后面的 Taylor 余项正是把这种光滑性假设转成定量误差界。</p>
 <h2 id="前向后向与中心差分为什么中心差分高一阶">1.2 前向、后向与中心差分：为什么中心差分高一阶</h2>
 <p>前向与后向割线的斜率分别是</p>
 <p><span class="math display">\[
@@ -58,14 +61,17 @@ D_0u(\bar x)=\frac{u(\bar x+h)-u(\bar x-h)}{2h}
 =u&#39;(\bar x)+\frac{h^2}{6}u&#39;&#39;&#39;(\bar x)+O(h^4).
 \]</span></p>
 <p>因此单侧式一般为一阶，中心式一般为二阶。<strong>“一般”很重要</strong>：若恰好 <span class="math inline">\(u&#39;&#39;(\bar x)=0\)</span>，前向式的首项消失，此点的观察阶可能更高；这不改变公式对任意足够光滑函数的通常精度阶。</p>
+<p>对称性可写成权重的矩条件。若一个一阶导数公式为 <span class="math inline">\(D_hu=h^{-1}\sum_{r}a_ru(\bar x+rh)\)</span>，要求常数项消失、一次项留下，便是 <span class="math inline">\(\sum_ra_r=0\)</span>、<span class="math inline">\(\sum_rra_r=1\)</span>；若还想消去二次、三次项，则相应要求 <span class="math inline">\(\sum_rr^2a_r=0\)</span>、<span class="math inline">\(\sum_rr^3a_r=0\)</span>。中心差分的非零权重为 <span class="math inline">\(a_{-1}=-1/2,a_1=1/2\)</span>；它自动消去每个偶次矩。因此误差在除以 <span class="math inline">\(h\)</span> 后首先来自三次 Taylor 项，即 <span class="math inline">\(h^2u&#39;&#39;&#39;/6\)</span>。</p>
 <p>原书还展示一个使用 <span class="math inline">\(\bar x+h,\bar x,\bar x-h,\bar x-2h\)</span> 的三阶一阶导数公式：</p>
 <p><span class="math display">\[
 D_3u(\bar x)=\frac{2u(\bar x+h)+3u(\bar x)-6u(\bar x-h)+u(\bar x-2h)}{6h}
 =u&#39;(\bar x)+\frac{h^3}{12}u^{(4)}(\bar x)+O(h^4).
 \]</span></p>
 <p>各点不对称不等于只能一阶：是否高阶取决于 Taylor 项的<strong>权重矩条件</strong>，不是仅凭图形外观判断。</p>
+<p>以 <span class="math inline">\(D_3\)</span> 为例，把四个节点的偏移记为 <span class="math inline">\(r=(1,0,-1,-2)\)</span>，分子权重记为 <span class="math inline">\(a=(2,3,-6,1)/6\)</span>。逐项求和可验算 <span class="math inline">\(\sum a_r=0\)</span>、<span class="math inline">\(\sum ra_r=1\)</span>、<span class="math inline">\(\sum r^2a_r=\sum r^3a_r=0\)</span>，而 <span class="math inline">\(\sum r^4a_r=2\)</span>。因此四阶 Taylor 项除以 <span class="math inline">\(4!h\)</span> 后恰给 <span class="math inline">\(h^3u^{(4)}/12\)</span>。这个验算比直接记住四个系数更可靠。</p>
 <h3 id="从误差图读精度阶">从误差图读精度阶</h3>
 <p>若 <span class="math inline">\(E(h)\approx Ch^p\)</span>，取绝对值再取对数得 <span class="math inline">\(\log|E(h)|\approx\log|C|+p\log h\)</span>。在双对数图中，直线斜率近似 <span class="math inline">\(p\)</span>。原书例 1.1 用 <span class="math inline">\(u(x)=\sin x\)</span>、<span class="math inline">\(\bar x=1\)</span> 对比上述四个公式：分别可看到一阶、一阶、二阶、三阶趋势。实际算到极小 <span class="math inline">\(h\)</span> 时，函数值相减会有浮点消去误差，误差曲线不一定继续下降；观察斜率应选未被舍入误差支配的区间。</p>
+<p>这个例子还可在画图前预测主项系数：<span class="math inline">\(D_+-u&#39;\sim\tfrac12u&#39;&#39;(1)h=-\tfrac12\sin(1)h\)</span>，<span class="math inline">\(D_0-u&#39;\sim u&#39;&#39;&#39;(1)h^2/6=-\cos(1)h^2/6\)</span>，<span class="math inline">\(D_3-u&#39;\sim u^{(4)}(1)h^3/12=\sin(1)h^3/12\)</span>。若把网格宽度减半，理论上三者的误差幅值分别接近原来的 <span class="math inline">\(1/2,1/4,1/8\)</span>。比较比值时应避开误差过零、首项偶然消失和舍入误差主导的网格区间。</p>
 <h2 id="用待定系数法自己造一个边界公式">1.3 用待定系数法自己造一个边界公式</h2>
 <p>边界附近可能没有 <span class="math inline">\(\bar x+h\)</span> 的数据。只使用 <span class="math inline">\(\bar x,\bar x-h,\bar x-2h\)</span>，设</p>
 <p><span class="math display">\[
@@ -80,7 +86,9 @@ a+b+c=0,\qquad -h(b+2c)=1,\qquad b+4c=0.
 \boxed{Du(\bar x)=\frac{3u(\bar x)-4u(\bar x-h)+u(\bar x-2h)}{2h}}.
 \]</span></p>
 <p>再保留三阶导数项可得 <span class="math inline">\(Du-u&#39;=-(h^2/3)u&#39;&#39;&#39;(\bar x)+O(h^3)\)</span>。用 <span class="math inline">\(u(x)=x^3\)</span> 代入，误差恰为 <span class="math inline">\(-2h^2\)</span>，与 <span class="math inline">\(-(h^2/3)u&#39;&#39;&#39;=-2h^2\)</span> 一致。这也是核对中文 TeX 稿相应译注的一种直接方法。第二章处理 Neumann 边界条件时会再次用到三点单侧导数。</p>
+<p><strong>多项式精确性的检验。</strong>这个公式对任意二次多项式都精确，因为上面的三个矩条件已匹配 <span class="math inline">\(1,x,x^2\)</span>。检验可以选基函数：常数应给 <span class="math inline">\(0\)</span>，<span class="math inline">\(u(x)=x-\bar x\)</span> 应给 <span class="math inline">\(1\)</span>，<span class="math inline">\(u(x)=(x-\bar x)^2\)</span> 应给 <span class="math inline">\(0\)</span>。若任何一项失败，就无需再讨论它是否二阶。对三次基函数，结果与真导数之差为 <span class="math inline">\(-2h^2\)</span>，直接揭示首个未被消去的项。</p>
 <p>另一个角度是插值：通过这三个节点构造二次插值多项式 <span class="math inline">\(p(x)\)</span>，取 <span class="math inline">\(p&#39;(\bar x)\)</span>，就得到同一组系数。待定系数法与插值求导是在描述同一个线性泛函。</p>
+<p>可以把这个等价关系证明得更明确。令 <span class="math inline">\(\ell_j(x)\)</span> 是三个节点的 Lagrange 基函数，满足 <span class="math inline">\(\ell_j(x_i)=\delta_{ij}\)</span>，则 <span class="math inline">\(p(x)=\sum_ju(x_j)\ell_j(x)\)</span>，从而 <span class="math inline">\(p&#39;(\bar x)=\sum_j\ell&#39;_j(\bar x)u(x_j)\)</span>。权重 <span class="math inline">\(\ell&#39;_j(\bar x)\)</span> 必须对全部二次多项式精确；上一组矩条件的解又唯一，因此它们正是 <span class="math inline">\(3/(2h),-2/h,1/(2h)\)</span>。这种唯一性论证适用于后面的任意节点公式。</p>
 <h2 id="二阶与更高阶导数">1.4 二阶与更高阶导数</h2>
 <p>把两侧 Taylor 式相加，奇次幂抵消，得到二阶中心差分</p>
 <p><span class="math display">\[
@@ -88,6 +96,7 @@ a+b+c=0,\qquad -h(b+2c)=1,\qquad b+4c=0.
 =u&#39;&#39;(\bar x)+\frac{h^2}{12}u^{(4)}(\bar x)+O(h^4).}
 \]</span></p>
 <p>也可从“斜率的差”理解：<span class="math inline">\(D^{(2)}_h=D_+D_-=D_-D_+\)</span>。分子中的 <span class="math inline">\(1,-2,1\)</span> 并非记忆口诀；它来自右侧斜率 <span class="math inline">\((u_{i+1}-u_i)/h\)</span> 减去左侧斜率 <span class="math inline">\((u_i-u_{i-1})/h\)</span>，再除以 <span class="math inline">\(h\)</span>。</p>
+<p>误差阶可用单项式再次核对。<span class="math inline">\(D_h^{(2)}\)</span> 对 <span class="math inline">\(1,x,x^2,x^3\)</span> 在中心点给出正确的二阶导数；对 <span class="math inline">\(u(x)=(x-\bar x)^4\)</span>，数值结果为 <span class="math inline">\(2h^2\)</span>，而真二阶导数为 <span class="math inline">\(0\)</span>。因为 <span class="math inline">\(u^{(4)}=24\)</span>，误差公式中的 <span class="math inline">\(h^2u^{(4)}/12\)</span> 也正是 <span class="math inline">\(2h^2\)</span>。这里需要 <span class="math inline">\(u\)</span> 在节点邻域有足够多的连续导数；仅有两阶可微不足以直接使用 <span class="math inline">\(O(h^4)\)</span> 的余项表达。</p>
 <p>当相邻间距不等，令 <span class="math inline">\(h_-=x_i-x_{i-1}\)</span>、<span class="math inline">\(h_+=x_{i+1}-x_i\)</span>，先求两侧斜率，再取它们按距离归一化的差：</p>
 <p><span class="math display">\[
 D^{(2)}u(x_i)=\frac{2}{h_-+h_+}
@@ -98,7 +107,12 @@ D^{(2)}u(x_i)=\frac{2}{h_-+h_+}
 \frac{h_+-h_-}{3}u^{(3)}(x_i)+O(h_-^2+h_+^2).
 \]</span></p>
 <p>随机不等距的三个点通常只给一阶；等距时 <span class="math inline">\(h_+-h_-=0\)</span>，恢复二阶。若节点来自光滑映射 <span class="math inline">\(x_i=X(ih)\)</span>，相邻间距差为 <span class="math inline">\(O(h^2)\)</span>，第二章将说明这种非均匀网格仍可能具有二阶精度。</p>
+<p>更完整的展开是 <span class="math display">\[D^{(2)}u(x_i)-u&#39;&#39;(x_i)=\frac{h_+-h_-}{3}u&#39;&#39;&#39;(x_i)
++\frac{h_-^3+h_+^3}{12(h_-+h_+)}u^{(4)}(x_i)+O(h_-^3+h_+^3).\]</span> 在 <span class="math inline">\(h_-=h_+=h\)</span> 时，第一项为零，第二项化为 <span class="math inline">\(h^2u^{(4)}/12\)</span>。例如令 <span class="math inline">\(h_-=h\)</span>、<span class="math inline">\(h_+=2h\)</span>，并取 <span class="math inline">\(u(x)=(x-x_i)^3\)</span>，则真二阶导数为零，而公式给出 <span class="math inline">\(2h\)</span>；这直接展示了固定比例的不对称网格为什么一般仅一阶。</p>
 <p>高阶导数也可由低阶差分复合。例如 <span class="math inline">\(D_+D^{(2)}_hu\)</span> 用四个节点逼近 <span class="math inline">\(u&#39;&#39;&#39;\)</span>，通常为一阶；采用对称的 <span class="math inline">\(D_0D_+D_-u\)</span> 可把奇次误差抵消，得到二阶。这里的要点是：<strong>求导次数、模板点数、对称性</strong>共同决定阶数。</p>
+<p>两个三阶导数公式写开后分别为 <span class="math display">\[D_+D_h^{(2)}u(x)=\frac{u(x+2h)-3u(x+h)+3u(x)-u(x-h)}{h^3}
+=u&#39;&#39;&#39;(x)+\frac h2u^{(4)}(x)+O(h^2),\]</span> <span class="math display">\[D_0D_+D_-u(x)=\frac{u(x+2h)-2u(x+h)+2u(x-h)-u(x-2h)}{2h^3}
+=u&#39;&#39;&#39;(x)+\frac{h^2}{4}u^{(5)}(x)+O(h^4).\]</span> 两者都对三次多项式精确，但首个未抵消的 Taylor 项不同。复合差分时也要注意网格节点的位置：先在半节点算通量、再在整数节点取散度，常比机械地把同一个矩阵平方更符合守恒结构。</p>
 <h2 id="任意节点上的差分权重从哪里来">1.5 任意节点上的差分权重从哪里来</h2>
 <p>给定互异节点 <span class="math inline">\(x_1,\ldots,x_n\)</span>，希望用 <span class="math inline">\(\sum_{j=1}^nc_ju(x_j)\)</span> 近似 <span class="math inline">\(u^{(k)}(\bar x)\)</span>。令 <span class="math inline">\(d_j=x_j-\bar x\)</span>。对每个 <span class="math inline">\(u(x_j)\)</span> 作 Taylor 展开，并让该线性组合对 <span class="math inline">\(1,(x-\bar x),\ldots,(x-\bar x)^{n-1}\)</span> 的导数<strong>精确</strong>，便得到 <span class="math inline">\(n\)</span> 个矩条件：</p>
 <p><span class="math display">\[
@@ -106,8 +120,11 @@ D^{(2)}u(x_i)=\frac{2}{h_-+h_+}
 \qquad q=0,1,\ldots,n-1.
 \]</span></p>
 <p>这是一个 Vandermonde 型线性系统。若 <span class="math inline">\(n\ge k+1\)</span> 且节点互异，权重唯一。前 <span class="math inline">\(n\)</span> 个 Taylor 单项式都被正确处理，所以一般至少有 <span class="math inline">\(O(h^{n-k})\)</span> 的局部误差；因对称性额外抵消时还可能更高。误差常数还取决于节点分布与函数高阶导数，不能只凭 <span class="math inline">\(n-k\)</span> 评价一个公式。</p>
+<p>要从矩条件推出这个阶数，还需声明一个<strong>规则缩放的节点族</strong>：<span class="math inline">\(x_j=\bar x+h\xi_j\)</span>，其中互异的 <span class="math inline">\(\xi_j\)</span> 在 <span class="math inline">\(h\to0\)</span> 时保持固定且有界。由矩系统可知 <span class="math inline">\(c_j=h^{-k}w_j\)</span>，<span class="math inline">\(w_j\)</span> 与 <span class="math inline">\(h\)</span> 无关。对各节点写到 <span class="math inline">\(n\)</span> 次的 Taylor 式，<span class="math inline">\(q&lt;n\)</span> 的项被精确匹配，余项之和由 <span class="math inline">\(\sum_j|w_j|h^{n-k}|\xi_j|^n\sup|u^{(n)}|/n!\)</span> 控制。因此 <span class="math inline">\(O(h^{n-k})\)</span> 有明确的假设和常数来源。若归一化节点随着加密而彼此碰撞，权重可能发散，这个简单结论就不适用。</p>
 <p>例如 <span class="math inline">\(k=1\)</span>、<span class="math inline">\(d=(-h,0,h)\)</span> 时，条件依次是“权重和为零”“一阶矩为一”“二阶矩为零”，解为 <span class="math inline">\((-1,0,1)/(2h)\)</span>。<span class="math inline">\(k=2\)</span> 时同样三节点解为 <span class="math inline">\((1,-2,1)/h^2\)</span>。</p>
 <p>原书用解线性系统的 MATLAB 过程说明权重的来源，同时提醒：点数较多时直接解 Vandermonde 系统可能严重病态，实际生成高阶权重宜用更稳健的递推算法。<strong>差分公式的理论阶数与计算权重的浮点稳定性是两个问题。</strong></p>
+<p>为了看清病态从何而来，把矩阵写成 <span class="math inline">\(M_{qj}=\xi_j^q/q!\)</span>。当两个节点 <span class="math inline">\(\xi_j\)</span> 很接近时，矩阵的两列近乎相同；从函数值中区分它们需要较大的正负权重，舍入误差也随之被放大。即使节点分离，直接使用未经缩放的 <span class="math inline">\(d_j^q\)</span> 也会使不同阶量级悬殊。先在无量纲的 <span class="math inline">\(\xi_j\)</span> 上计算 <span class="math inline">\(w_j\)</span>、最后再乘 <span class="math inline">\(h^{-k}\)</span>，可以缓解尺度问题，却不能消除高阶 Vandermonde 本身的条件数问题。</p>
+<p>一个实用的验算流程是：先验证 <span class="math inline">\(\sum_jc_j(x_j-\bar x)^q/q!=\delta_{qk}\)</span>（<span class="math inline">\(0\le q&lt;n\)</span>）；再用 <span class="math inline">\(u(x)=(x-\bar x)^n\)</span> 检查首个非零误差项；最后才对非多项式函数做网格加密实验。这样能把“权重算错”“推导的阶数不对”“浮点舍入开始主导”三类现象分开。</p>
 <h2 id="第一章小结与继续阅读">第一章小结与继续阅读</h2>
 <p>第一章回答“怎样构造导数近似”和“该近似在真函数上误差多大”。第二章回答更难的问题：把差分式组成方程组并求解后，计算出的整组节点值是否逼近微分方程的解。请带着 <span class="math inline">\(D^{(2)}_h u=u&#39;&#39;+O(h^2)\)</span> 进入<a href="../ch02/">第二章：定常态与边值问题</a>；它会成为局部截断误差的起点。</p>
 </div></section></article><p class="study-back"><a href="/notes/leveque-finite-difference/">← 返回本系列目录</a></p></div></main><footer class="sidebar-translate" id="footer"><div class="copyright"><span>&copy; 2019 – 2025 </span><span class="with-love" id="animate"><span class="icon iconify" data-icon="ri:cloud-line"></span></span><span class="author"> Misty Sigh</span></div><div class="powered"><span>Powered by <a href="https://hexo.io" target="_blank" rel="noopener">Hexo</a> v7.3.0</span><span class="footer-separator">|</span><span>Theme - <a rel="noopener" href="https://github.com/YunYouJun/hexo-theme-yun" target="_blank"><span>Yun</span></a> v1.10.11</span></div></footer></div><a class="hty-icon-button" id="back-to-top" aria-label="back-to-top" href="#"><span class="icon iconify" data-icon="ri:arrow-up-s-line"></span><svg class="progress-circle-container" viewBox="0 0 100 100"><circle class="progress-circle" id="progressCircle" cx="50" cy="50" r="48" fill="none" stroke="#0078E7" stroke-width="2" stroke-linecap="round"></circle></svg></a><script src="https://fastly.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js"></script><script>const images = [...document.querySelectorAll('.markdown-body img')]
