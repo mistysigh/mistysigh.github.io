@@ -1,0 +1,6 @@
+/* Editorial brand layer — scoped to homepage; does not replace Yun theme */
+:root{--rain-ink:#384b4a;--rain-muted:#7d8c83;--rain-paper:#f5efe5;--rain-border:#d9d0c2}
+.rain-brand{display:flex;align-items:center;gap:12px;max-width:960px;margin:24px auto 12px;padding:14px 22px;border:1px solid var(--rain-border);border-radius:18px;background:rgba(245,239,229,.92);color:var(--rain-ink);text-decoration:none!important;box-shadow:0 5px 20px rgba(65,60,48,.05)}
+.rain-brand img{width:52px;height:52px;flex:none}.rain-brand-copy{display:flex;flex-direction:column;min-width:0}.rain-brand-name{font-family:'Noto Serif SC',serif;font-size:1.4rem;font-weight:900;letter-spacing:.12em;line-height:1.5}.rain-brand-sub{font-size:.72rem;letter-spacing:.08em;color:#6d7770}.rain-brand-motto{margin-left:auto;font-size:.8rem;color:#6d7770;white-space:nowrap}
+.dark .rain-brand{background:#252e2e;border-color:#465552;color:#e7e3d9}.dark .rain-brand-sub,.dark .rain-brand-motto{color:#b9c2bb}
+@media(max-width:650px){.rain-brand{margin:12px 12px 8px;padding:10px 14px;border-radius:14px}.rain-brand img{width:42px;height:42px}.rain-brand-name{font-size:1.12rem}.rain-brand-motto{display:none}}
