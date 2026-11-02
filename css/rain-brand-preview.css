@@ -1,0 +1,68 @@
+/* Public visual-preview asset: changes here do not affect live or redesign branches. */
+
+/* 雨落成海 — 云海手札 v2, scoped to homepage / Hexo Yun */
+:root{--rain-paper:#f8f5ee;--rain-card:#fffcf7;--rain-ink:#243c46;--rain-muted:#667983;--rain-line:#e8dfd3;--rain-sea:#345766;--rain-bronze:#986440}
+html{scroll-behavior:smooth}
+body.is-home{background:var(--rain-paper)!important;color:var(--rain-ink)}
+body.is-home .container{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+body.is-home .sidebar,body.is-home .sidebar-toggle,body.is-home .sidebar-overlay{display:none!important}
+body.is-home .sidebar-translate{transform:none!important;margin-left:0!important;padding-left:0!important}
+body.is-home #content{width:100%!important;max-width:1320px!important;margin:0 auto!important;padding:0 clamp(16px,3vw,45px) 24px!important;box-sizing:border-box}
+body.is-home #banner,body.is-home #say,body.is-home #goDown{display:none!important}
+body.is-home #footer{margin:0 auto;max-width:1240px;border-top:1px solid var(--rain-line);color:var(--rain-muted)}
+body.is-home .rain-header{position:relative;display:flex;align-items:center;gap:21px;padding:10px 16px;margin:15px 0 0;background:rgba(255,252,247,.97);border:1px solid var(--rain-line);border-radius:18px 18px 0 0;box-shadow:0 5px 22px #403f320c;z-index:3;min-height:76px}
+body.is-home .rain-brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;color:var(--rain-ink)!important;text-decoration:none!important;min-width:0}
+body.is-home .rain-brand-icon{width:62px;height:62px;object-fit:contain;flex:none}
+body.is-home .rain-brand-title{width:151px;height:auto;display:block}
+body.is-home .rain-brand-seal{width:29px;height:36px;object-fit:contain;flex:none}
+body.is-home .rain-brand-signature{width:118px;height:31px;display:block;margin-left:5px;padding-left:18px;border-left:1px solid #d9ccbb;object-fit:contain}
+body.is-home .rain-nav{display:flex;align-items:center;gap:2px;margin-left:auto;flex-wrap:nowrap}
+body.is-home .rain-nav a,body.is-home .rain-controls button{display:inline-flex;align-items:center;justify-content:center;color:var(--rain-ink);background:transparent;border:0;text-decoration:none!important;padding:11px 12px;font-size:.92rem;white-space:nowrap;font-weight:600;cursor:pointer;border-radius:9px;line-height:1.2;transition:background .2s,color .2s}
+body.is-home .rain-nav a:hover,body.is-home .rain-controls button:hover{background:#f0e6d9;color:var(--rain-bronze)}
+body.is-home .rain-nav a[aria-current=page]{color:var(--rain-bronze);position:relative}
+body.is-home .rain-nav a[aria-current=page]:after{content:"";position:absolute;height:2px;background:var(--rain-bronze);left:13px;right:13px;bottom:1px}
+body.is-home .rain-controls{display:flex;gap:2px;align-items:center;padding-left:9px;border-left:1px solid var(--rain-line)}
+body.is-home .rain-controls button{font-size:1.25rem;width:37px;height:37px;padding:0;border-radius:50%}
+body.is-home .rain-menu-toggle{display:none!important}
+body.is-home .rain-hero{position:relative;isolation:isolate;overflow:hidden;border-radius:0 0 19px 19px;min-height:440px;padding:clamp(50px,9vw,124px) clamp(32px,8vw,112px);background:#27465a url('https://raw.githack.com/mistysigh/mistysigh.github.io/editorial-preview/images/rain-hero-landscape.svg') center 48%/cover no-repeat;box-sizing:border-box}
+body.is-home .rain-hero:before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(16,45,58,.72) 0%,rgba(21,45,56,.45) 47%,rgba(15,37,51,.04) 100%)}
+body.is-home .rain-hero-kicker{display:block;letter-spacing:.34em;font-size:.76rem;color:#eacdb1;text-transform:uppercase;font-weight:600}
+body.is-home .rain-hero h1{font-family:'Noto Serif SC','Songti SC',serif;font-size:clamp(1.65rem,3.1vw,2.65rem);line-height:1.7;font-weight:500;letter-spacing:.1em;color:#fff7ef;margin:22px 0 0;max-width:660px;text-wrap:balance;text-shadow:0 1px 7px #132b3b80}
+body.is-home .rain-hero p{color:#f2e7db;max-width:600px;margin:16px 0 0;line-height:1.9;font-size:1rem}
+body.is-home .rain-hero-actions{display:flex;align-items:center;flex-wrap:wrap;gap:13px;margin-top:29px}
+body.is-home .rain-hero-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 24px;border:1px solid #fff9f2b8;border-radius:28px;color:#fff;text-decoration:none!important;font-size:.94rem;transition:transform .18s,background .18s}
+body.is-home .rain-hero-actions a:first-child{background:var(--rain-bronze);border-color:var(--rain-bronze)}
+body.is-home .rain-hero-actions a:hover{transform:translateY(-2px);background:#b17951}
+body.is-home .notice{margin:25px auto 0;padding:15px 20px;max-width:910px;text-align:center;background:transparent;color:var(--rain-muted);border:0;border-bottom:1px solid var(--rain-line);font-family:'Noto Serif SC','Songti SC',serif;letter-spacing:.065em;box-shadow:none!important}
+body.is-home .rain-discover{max-width:1130px;margin:50px auto 0}
+body.is-home .rain-discover-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--rain-line);padding-bottom:14px;margin-bottom:23px}
+body.is-home .rain-discover h2{color:var(--rain-ink);font-family:'Noto Serif SC','Songti SC',serif;font-weight:700;font-size:1.55rem;letter-spacing:.12em;margin:0}
+body.is-home .rain-discover-note{color:var(--rain-muted);font-size:.8rem;letter-spacing:.08em}
+body.is-home .rain-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+body.is-home .rain-filter button{font:inherit;font-size:.85rem;padding:7px 16px;border:1px solid var(--rain-line);border-radius:99px;background:transparent;color:var(--rain-muted);cursor:pointer;transition:background .2s}
+body.is-home .rain-filter button[aria-pressed=true]{background:var(--rain-sea);border-color:var(--rain-sea);color:#fff}
+body.is-home .rain-search{width:min(100%,390px);padding:12px 16px;border-radius:10px;border:1px solid var(--rain-line);background:var(--rain-card);color:var(--rain-ink);margin:0 0 18px}
+body.is-home .rain-articles{display:grid;grid-template-columns:1.45fr 1fr;gap:21px}
+body.is-home .rain-articles .study-section-card{border-radius:12px;background:var(--rain-card);border:1px solid var(--rain-line);padding:30px!important;box-shadow:0 10px 35px rgba(33,63,72,.038)!important;margin:0!important;min-width:0}
+body.is-home .rain-articles .study-section-card .post-header{border-bottom:1px solid var(--rain-line);margin:0 0 12px;padding:0 0 12px}
+body.is-home .rain-articles .study-section-card .post-title{font-family:'Noto Serif SC','Songti SC',serif;font-size:1.22rem;letter-spacing:.08em;color:var(--rain-ink);margin:0}
+body.is-home .rain-articles .study-section-card p{color:var(--rain-muted);line-height:1.8}
+body.is-home .rain-articles .study-section-card ul{margin:22px 0;padding-left:1.25rem;list-style:none}
+body.is-home .rain-articles .study-section-card li{position:relative;margin:15px 0;padding-left:12px;color:var(--rain-muted);font-size:.91rem;line-height:1.8;overflow-wrap:anywhere}
+body.is-home .rain-articles .study-section-card li:before{content:"";position:absolute;left:-8px;top:.82em;border-radius:50%;width:5px;height:5px;background:#aa8362}
+body.is-home .rain-articles .study-section-card a{color:var(--rain-sea);text-decoration:none}
+body.is-home .rain-articles .study-section-card a:hover{text-decoration:underline;text-underline-offset:4px}
+body.is-home .rain-articles .study-section-card[hidden],body.is-home .rain-articles li[hidden],body.is-home .rain-search[hidden],body.is-home .rain-empty[hidden]{display:none!important}
+body.is-home .rain-empty{padding:35px;text-align:center;border:1px dashed var(--rain-line);color:var(--rain-muted)}
+body.is-home .study-back{max-width:1130px;margin:25px auto 15px;text-align:right}
+body.is-home .study-back a{color:var(--rain-bronze)}
+body.is-home a:focus-visible,body.is-home button:focus-visible,body.is-home input:focus-visible{outline:3px solid #76a9b3!important;outline-offset:3px}
+html.dark{--rain-paper:#1b272d;--rain-card:#26363d;--rain-ink:#e7e3da;--rain-muted:#aebdc3;--rain-line:#40535a;--rain-sea:#a6c9d3;--rain-bronze:#c69a76}
+html.dark body.is-home .rain-header{background:#25353bee}
+html.dark body.is-home .rain-nav a:hover,html.dark body.is-home .rain-controls button:hover{background:#344a52}
+html.dark body.is-home .rain-brand-title,html.dark body.is-home .rain-brand-signature{filter:invert(1) sepia(.2)}
+html.dark body.is-home .rain-filter button[aria-pressed=true]{background:#517887;border-color:#517887;color:#fff}
+@media(max-width:1200px){body.is-home .rain-brand-signature{display:none!important}body.is-home .rain-header{gap:10px}body.is-home .rain-nav a{padding:10px 8px}}
+@media(max-width:860px){body.is-home .rain-header{flex-wrap:wrap;padding:10px 16px;min-height:0}body.is-home .rain-brand-icon{width:50px;height:50px}body.is-home .rain-brand-title{width:127px}body.is-home .rain-brand-seal{width:25px;height:29px}body.is-home .rain-menu-toggle{display:inline-flex!important}body.is-home .rain-controls{margin-left:auto}body.is-home .rain-nav{order:3;flex-basis:100%;display:none;flex-wrap:wrap;margin:0;padding:9px 0 4px;border-top:1px solid var(--rain-line)}body.is-home .rain-nav[data-open=true]{display:flex}body.is-home .rain-nav a{flex:1 1 31%;justify-content:center}body.is-home .rain-articles{grid-template-columns:1fr}body.is-home .rain-hero{min-height:390px;padding:60px 35px}}
+@media(max-width:540px){body.is-home #content{padding:0 10px 16px!important}body.is-home .rain-header{margin-top:8px;padding:8px 10px;border-radius:13px 13px 0 0}body.is-home .rain-brand{gap:6px}body.is-home .rain-brand-icon{width:42px;height:42px}body.is-home .rain-brand-title{width:109px}body.is-home .rain-brand-seal{width:20px;height:24px}body.is-home .rain-hero{min-height:380px;padding:52px 24px;background-position:60% center;border-radius:0 0 13px 13px}body.is-home .rain-hero h1{font-size:1.55rem}body.is-home .rain-hero-kicker{font-size:.62rem}body.is-home .rain-hero p{font-size:.88rem}body.is-home .rain-discover{margin-top:33px}body.is-home .rain-articles .study-section-card{padding:21px!important}body.is-home .notice{font-size:.77rem}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}body.is-home .rain-hero-actions a,body.is-home .rain-nav a,body.is-home .rain-filter button{transition:none!important}}
