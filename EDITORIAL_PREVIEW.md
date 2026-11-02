@@ -1,29 +1,34 @@
-# 雨落成海 · 首页改版预览
+# 雨落成海 · 独立预览与上线检查
 
-此目录中的改动只存在于 `design/editorial-homepage` 分支。线上发布分支为 `gh-pages`，不要直接合并或修改 Pages 发布来源。
+## 在线预览（不影响线上站点）
 
-## 本地预览（不会部署）
+- **预览网址**：https://raw.githack.com/mistysigh/mistysigh.github.io/editorial-preview/index.html
+- 预览分支：`editorial-preview`，从 `design/editorial-homepage` 独立复制。
+- 正式发布分支：`gh-pages`，本次操作没有修改。
+- 开发分支：`design/editorial-homepage`，保留原本可用于未来整合的代码。
 
-1. `git clone --branch design/editorial-homepage https://github.com/mistysigh/mistysigh.github.io.git`
-2. `cd mistysigh.github.io`
-3. `python3 -m http.server 8000`
-4. 浏览器打开 `http://localhost:8000/`。
+预览通过第三方 raw.githack.com 开发 CDN 直接载入公开 GitHub 文件，**并非 GitHub Pages 正式部署，也不是独立托管服务的保证可用发布**。它可能展示一次安全确认页面，并可能延迟数分钟反映最新提交。若浏览器报错，亦可尝试备用地址：
 
-使用本地 HTTP 服务而非双击 HTML 文件，是为了让以 `/css/`、`/js/`、`/images/` 开头的资源路径正确加载。
+https://htmlpreview.github.io/?https://github.com/mistysigh/mistysigh.github.io/blob/editorial-preview/index.html
 
-## 已实现
+## 预览边界
 
-- 首页中文品牌「雨落成海」、SVG Logo 与 SVG favicon
-- 杂志式首页主视觉与品牌导航
-- 真实现有笔记、生活记录的分类筛选与本页搜索
-- 响应式布局、暗色模式和键盘焦点样式
+- 只对首页应用新版视觉及筛选交互；学术笔记、生活记录等栏目链接跳转至既有正式站点。
+- 预览分支中特设 `css/rain-brand-preview.css`、`js/rain-brand-preview.js`，把根路径资源修正为可跨站点加载的绝对网址。
+- 保留了文档中所有有效文章链接，没有迁移或修改正式页面。
+- 不要将 `editorial-preview` 配置为 mistysigh.github.io 的 GitHub Pages 发布源。
+- 该服务可能出现缓存、浏览器安全限制或外部脚本资源限制；仓库文件存在性检查不等于已验证页面真实加载。
 
-## 发布前核验
+## 桌面和手机检查
 
-- [ ] 桌面和手机端检查导航、内容卡片、搜索与分类筛选
-- [ ] 检查亮色/暗色模式与键盘 Tab 导航
-- [ ] 检查 `/notes/`、`/life/`、`/archives/`、`/about/` 的链接
-- [ ] 查明 Hexo 源码与部署流水线：当前分支是静态生成结果，直接编辑 `index.html` 可能在下一次 Hexo 构建时被覆盖
-- [ ] 如需公网预览，单独配置不指向 `gh-pages` 的预览部署（如独立预览项目）；本分支本身不会自动生成公网预览网址
+- [ ] 电脑端检查云海横幅、书法 Logo、印章、导航、文章卡片布局
+- [ ] 手机端检查导航菜单、标题缩放、水平溢出、横幅图片裁切
+- [ ] 测试“全部 / 学术笔记 / 日常生活”的过滤
+- [ ] 测试搜索框及“无匹配文章”提示
+- [ ] 检查亮色/暗色模式与键盘 Tab 操作
+- [ ] 检查控制台错误、第三方 CDN 字体和脚本加载
+- [ ] 核对所有文章 URL，确认导航不会跳转至不存在的预览路径
 
-注意：当前品牌只接入首页；文章页和栏目页仍保持旧站标题及图标。
+## 仍需解决
+
+正式上线前应找到原始 Hexo 源码仓库与部署流程，避免重新构建时覆盖静态页面改动。任何上线都应在完成桌面和手机实测之后单独确认。
